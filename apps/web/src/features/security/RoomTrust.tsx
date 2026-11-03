@@ -58,7 +58,9 @@ export function RoomTrust({ client, roomId, revision, onVerificationRequested }:
               void requestPeerVerification(client, peer.userId, roomId)
                 .then((request) => {
                   onVerificationRequested(request);
-                  setNotice('Запрос проверки отправлен. Сравните код в разделе «Подтверждение устройств».');
+                  setNotice(
+                    'Запрос проверки отправлен. Сравните код в разделе «Подтверждение устройств».',
+                  );
                 })
                 .catch(() => setNotice('Не удалось запросить проверку.'))
             }
