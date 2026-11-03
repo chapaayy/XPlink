@@ -1,5 +1,7 @@
 name: Format XPlink stage 2
 on:
+  push:
+    branches: [feat/stage-2-identity-recovery]
   workflow_dispatch:
 permissions:
   contents: write
