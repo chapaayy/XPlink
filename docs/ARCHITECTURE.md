@@ -18,3 +18,7 @@ UI получает от `matrix-adapter` только примитивы и т�
 `createEncryptedRoom()` задаёт `m.room.encryption` уже в `initial_state`; `sendEncryptedMessage()` проверяет **оба** сигнала шифрования (state event и Rust Crypto) и отказывается от отправки без них. Web Locks исключают конкурентное открытие одной Rust Crypto store в соседней вкладке.
 
 Нет собственных `services/control-api`, `rtc-adapter`, LiveKit: они нужны позже, если принят ADR и подтверждена потребность. Критические API у Matrix. См. `docs/DATA_FLOW.md`.
+
+## Этап 2
+
+Контур trust и recovery остаётся в браузерном `matrix-adapter`. React-части `features/security` лишь принимают пользовательское подтверждение и показывают статус. Серверу разрешено хранить только зашифрованный secret storage и encrypted Megolm key backup. `SecretStorageAccess` предоставляет SDK исключительно временный raw key в памяти браузера, без серверной обработки. Запрещено добавлять самописный криптографический примитив или сторонний backend для этой логики.
