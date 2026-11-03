@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { ClientEvent, MatrixEventEvent, RoomEvent } from 'matrix-js-sdk';
 import type { MatrixClient } from 'matrix-js-sdk';
 import { acquireCryptoTab, initializeMatrix } from '@xplink/matrix-adapter';
-import type { StoredSession } from '@xplink/matrix-adapter';
+import type { StoredSession, SecretStorageAccess } from '@xplink/matrix-adapter';
 
 export type SyncStatus = 'connecting' | 'syncing' | 'ready' | 'blocked' | 'error';
 
 /** Runtime is intentionally owned by exactly one mounted App, not every feature. */
-export function useMatrix(session: StoredSession | null) {
+export function useMatrix(session: StoredSession | null, secretAccess: SecretStorageAccess) {
   const [client, setClient] = useState<MatrixClient | null>(null);
   const [status, setStatus] = useState<SyncStatus>('connecting');
   const [error, setError] = useState('');
@@ -38,7 +38,7 @@ export function useMatrix(session: StoredSession | null) {
           setError('Откройте XPlink только в одной вкладке. Web Locks недоступны или заняты.');
           return;
         }
-        activeClient = await initializeMatrix(session);
+        activeClient = await initializeMatrix(session, secretAccess);
         if (cancelled) {
           activeClient.stopClient();
           releaseTab();
@@ -67,7 +67,7 @@ export function useMatrix(session: StoredSession | null) {
       activeClient?.stopClient();
       releaseTab?.();
     };
-  }, [session]);
+  }, [session, secretAccess]);
 
   return { client, status, error, revision };
 }

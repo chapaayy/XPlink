@@ -5,15 +5,19 @@ import { RoomList } from '../features/channels/RoomList';
 import { CreateRoomForm } from '../features/channels/CreateRoomForm';
 import { MessageTimeline } from '../features/messages/MessageTimeline';
 import { Composer } from '../features/messages/Composer';
+import { SecurityPanel } from '../features/security/SecurityPanel';
+import type { SecretStorageAccess } from '@xplink/matrix-adapter';
 
 interface Props {
+  secretAccess: SecretStorageAccess;
   client: MatrixClient;
   revision: number;
   userId: string;
   onLogout: () => Promise<void>;
 }
 
-export function AppShell({ client, revision, userId, onLogout }: Props) {
+export function AppShell({ client, revision, userId, onLogout, secretAccess }: Props) {
+  const [showSecurity, setShowSecurity] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [securityState, setSecurityState] = useState('');
   const rooms = listRooms(client);
@@ -53,6 +57,7 @@ export function AppShell({ client, revision, userId, onLogout }: Props) {
           />
           <CreateRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
         </div>
+        <button className="security-toggle" onClick={() => setShowSecurity((value) => !value)} aria-expanded={showSecurity}>🔐 Безопасность и устройства</button>
         <footer className="sidebar-footer">
           <div className="user-avatar">{userId.at(1)?.toUpperCase() ?? '?'}</div>
           <div className="user-info">
@@ -105,6 +110,9 @@ export function AppShell({ client, revision, userId, onLogout }: Props) {
           </div>
         )}
       </main>
+      <aside className={showSecurity ? 'security-panel' : 'security-panel security-panel-hidden'} aria-label="Безопасность">
+        <SecurityPanel client={client} secretAccess={secretAccess} roomId={active?.id ?? null} revision={revision} />
+      </aside>
     </div>
   );
 }

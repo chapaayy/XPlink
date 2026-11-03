@@ -8,3 +8,13 @@ export type { RoomSummary } from './rooms';
 export { sendEncryptedMessage } from './messages';
 export { roomMessages } from './timeline';
 export type { ChatMessage } from './timeline';
+
+export { SecretStorageAccess } from './secret-storage';
+export { createRecovery, getRecoveryStatus, recoverDevice } from './recovery';
+export type { RecoveryStatus } from './recovery';
+export { listOwnDevices, revokeDevice } from './devices';
+export type { OwnDevice } from './devices';
+export { roomIdentities, assertStableRoomIdentities, removeRoomMember } from './identity';
+export type { PeerIdentity } from './identity';
+export { VerificationFlow, requestOwnVerification, requestPeerVerification } from './verification';
+export type { SasDisplay } from './verification';
