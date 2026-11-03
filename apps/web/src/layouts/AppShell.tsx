@@ -48,7 +48,7 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
           <span className="online-dot" title="Подключено" />
         </header>
         <div className="sidebar-scroll">
-          <p className="section-label">Каналы · этап 1</p>
+          <p className="section-label">Каналы</p>
           <RoomList
             client={client}
             selectedRoomId={selected}
@@ -110,8 +110,8 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
               пользователя появится приглашение.
             </p>
             <p className="muted">
-              До этапа 2 не используйте для критически важных данных: подтверждение устройств и
-              recovery ещё недоступны.
+              Сохраните recovery key в настройках безопасности и проверяйте новые устройства.
+              До публичного запуска XPlink необходим независимый аудит безопасности.
             </p>
           </div>
         )}

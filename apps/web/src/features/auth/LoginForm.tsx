@@ -20,7 +20,7 @@ export function LoginForm({ onLogin, error, busy }: Props) {
       >
         <div className="brand-logo">XP</div>
         <h1>XPlink</h1>
-        <p>Приватный E2EE-мессенджер · тестовый этап 1</p>
+        <p>Приватный E2EE-мессенджер · тестовый этап 2</p>
         <label htmlFor="username">Логин Matrix</label>
         <input
           id="username"
@@ -52,7 +52,7 @@ export function LoginForm({ onLogin, error, busy }: Props) {
         </small>
         <small>
           Ключи хранятся на этом устройстве. Не удаляйте данные браузера: восстановление ключей
-          будет в этапе 2.
+          доступно в настройках безопасности после входа.
         </small>
       </form>
     </main>
