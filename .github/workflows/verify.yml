@@ -1,0 +1,74 @@
+name: Verify XPlink stage 1
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm docs:check
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+  e2ee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Start fresh local Matrix stack
+        run: |
+          bash scripts/init-dev.sh
+          docker compose --env-file .env -f deploy/compose.dev.yml up --build -d
+          for i in $(seq 1 80); do
+            if bash scripts/healthcheck.sh; then exit 0; fi
+            sleep 3
+          done
+          docker compose --env-file .env -f deploy/compose.dev.yml logs --tail=80
+          exit 1
+      - name: Create two closed-registration test accounts
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          echo "XPLINK_TEST_PASSWORD=$password" >> "$GITHUB_ENV"
+          for username in alice bob; do
+            docker compose --env-file .env -f deploy/compose.dev.yml exec -T synapse \
+              register_new_matrix_user -c /data/homeserver.yaml \
+              -u "$username" -p "$password" --no-admin http://localhost:8008
+          done
+      - name: E2EE two-browser / server ciphertext acceptance
+        run: pnpm test:e2e
+      - name: Restart persistence smoke test
+        run: |
+          docker compose --env-file .env -f deploy/compose.dev.yml restart postgres synapse
+          for i in $(seq 1 60); do
+            if bash scripts/healthcheck.sh; then break; fi
+            sleep 3
+          done
+          count="$(docker compose --env-file .env -f deploy/compose.dev.yml exec -T postgres psql -U synapse -d synapse -tAc 'SELECT count(*) FROM rooms')"
+          test "$count" -gt 0
+          echo "Persisted rooms after restart: $count"
+      - name: Container status on failure (redact application payloads)
+        if: failure()
+        run: docker compose --env-file .env -f deploy/compose.dev.yml ps
