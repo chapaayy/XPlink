@@ -1,7 +1,5 @@
 name: Prepare locked stage-1 dependencies
 on:
-  push:
-    branches: [feat/stage-1-e2ee-foundation]
   workflow_dispatch:
 permissions:
   contents: write
