@@ -1,4 +1,4 @@
-# План проверок первого этапа
+# План проверок этапов 1 и 2
 
 **Быстрые:** `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm docs:check` (запускает Node-манифестный индекс). Юнит-тесты проверяют, что crypto отсутствует или state не encrypted => sendEvent не вызывается.
 
@@ -21,3 +21,5 @@ E2E: `tests/e2e/recovery-devices.spec.ts` использует два незав
 **Изоляция E2E:** каждый сценарий использует отдельную пару/аккаунт Synapse, чтобы rate limits для логина и изменения cross-signing / device identities одного теста не влияли на другие. Аккаунты создаются временно в job GitHub Actions при закрытой регистрации; ключи не печатаются.
 
 **CI ratelimit policy:** Synapse normally limits `rc_login.address` to a burst of 5 requests per IP; several independent browser cases run behind the same local Caddy address. Dev-only generated config raises the IP burst to 30 while retaining normal per-account and failed-attempt limits. Production must have a separate, strict policy.
+
+**Фактическая приёмка:** [GitHub Actions #41722622079](https://github.com/chapaayy/XPlink/actions/runs/41722622079), успешно 5/5 E2E, quality и restart persistence. Серверный отказ при чтении будущего события исключённым участником допускает HTTP 403 или 404 (скрытие существования приватного события), но не HTTP 200. Реальный CI не заменяет независимый аудит.

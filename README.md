@@ -1,4 +1,4 @@
-# XPlink — приватный мессенджер (Stage 2 development)
+# XPlink — приватный мессенджер (Stage 2 verified prototype)
 
 XPlink — самостоятельный веб-клиент для закрытого Matrix-сервера. Архитектура: **React + TypeScript + Vite + Tailwind**, **matrix-js-sdk / Rust Crypto WASM**, **Synapse + PostgreSQL + Caddy**. Никакой собственной криптографии или сервера, читающего сообщения. Цель — до 100 пользователей, но **это не готовый защищённый продукт**.
 
@@ -54,10 +54,14 @@ corepack pnpm docs:check
 
 Docker E2E запускается в CI на чистой среде и требует Chromium. Скрипт ручного E2E запуска — в `docs/TEST_PLAN.md`. Изменения изолированы в PR. Версии закреплены, lockfile должен быть сгенерирован pnpm в доверенной CI среде.
 
-**Важно:** `MATRIX_SERVER_NAME=localhost` — постоянная локальная Matrix identity. Если создать реальные аккаунты на другом домене, нельзя просто поменять `server_name`. Внешний HTTPS и поддерживаемый production-деплой относятся к этапу 6. Восстановление ключей, cross-signing и trust — в работе этапа 2, под проверкой E2E. **Не отправляйте секретные сообщения до прохождения всех проверок.**
+**Важно:** `MATRIX_SERVER_NAME=localhost` — постоянная локальная Matrix identity. Если создать реальные аккаунты на другом домене, нельзя просто поменять `server_name`. Внешний HTTPS и поддерживаемый production-деплой относятся к этапу 6. Восстановление ключей, cross-signing и trust проверены E2E-сценариями на локальном Matrix-сервере. **Не отправляйте секретные сообщения до прохождения всех проверок.**
 
 ## Навигация
 
 `docs/START_HERE.md` → `docs/PROJECT_MAP.md` → `docs/FILE_INDEX.md` → `docs/ARCHITECTURE.md` → `docs/SECURITY_MODEL.md` → `docs/ROADMAP.md`.
 
 Решения — `docs/adr/`, тесты — `docs/TEST_PLAN.md`, эксплуатация — `docs/runbooks/`.
+
+## Приёмка этапа 2
+
+В GitHub Actions [run #41722622079](https://github.com/chapaayy/XPlink/actions/runs/41722622079) прошли quality-проверки и все пять браузерных E2E-тестов, включая SAS, key recovery, server-side kick, запрет двух вкладок и ciphertext-обмен. Перезапуск инфраструктуры сохранил четыре комнаты. Результат относится к **локальному прототипу**, а не к проверенному для эксплуатации защищённому сервису.
