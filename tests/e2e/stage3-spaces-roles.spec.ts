@@ -98,9 +98,9 @@ test('space categories link E2EE channels and Synapse enforces readonly/role per
     const select = alice.getByLabel('Роль @bobwork:localhost');
     await expect(select).toBeVisible({ timeout: 20_000 });
     await select.selectOption('moderator');
-    await expect(bob.getByRole('button', { name: 'Отправить' })).toBeEnabled({ timeout: 30_000 });
     const message = 'MODERATOR-CAN-SEND-' + Date.now();
     await bob.getByRole('textbox', { name: 'Сообщение' }).fill(message);
+    await expect(bob.getByRole('button', { name: 'Отправить' })).toBeEnabled({ timeout: 30_000 });
     await bob.getByRole('button', { name: 'Отправить' }).click();
     await expect(alice.getByText(message)).toBeVisible({ timeout: 30_000 });
   } finally {
