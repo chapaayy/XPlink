@@ -45,8 +45,10 @@ export function useMatrix(session: StoredSession | null) {
           return;
         }
         activeClient.on(ClientEvent.Sync, sync);
-        activeClient.on(RoomEvent.Timeline, update);
-        activeClient.on(MatrixEventEvent.Decrypted, update);
+        activeClient.on(RoomEvent.Timeline, (event) => {
+          event.on(MatrixEventEvent.Decrypted, update);
+          update();
+        });
         setClient(activeClient);
         setStatus('syncing');
         await activeClient.startClient({ initialSyncLimit: 50 });
