@@ -1,4 +1,5 @@
 import type { MatrixClient } from 'matrix-js-sdk';
+import { EventType } from 'matrix-js-sdk';
 
 export type ChannelRole = 'member' | 'moderator' | 'admin';
 const LEVEL: Record<ChannelRole, number> = { member: 0, moderator: 50, admin: 100 };
@@ -72,7 +73,7 @@ export async function setChannelReadOnly(
     throw new Error('Доступен только защищённый канал.');
   const levels = roomPowerLevels(client, roomId);
   const threshold = readOnly ? 50 : 0;
-  await client.sendStateEvent(roomId, 'm.room.power_levels', {
+  await client.sendStateEvent(roomId, EventType.RoomPowerLevels, {
     ...levels,
     // All encrypted event kinds, including reactions and uploads, share this wire type.
     events_default: threshold,

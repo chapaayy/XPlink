@@ -72,8 +72,9 @@ export async function sendEncryptedAttachment(
 function authenticatedMediaUrl(client: MatrixClient, uri: string): string {
   // Construct only this fixed homeserver endpoint; never fetch arbitrary URLs.
   const match = /^mxc:\/\/([a-zA-Z0-9.:\-]+)\/([a-zA-Z0-9_\-]+)$/.exec(uri);
-  if (!match) throw new Error('Вложение имеет неверный Matrix URI.');
-  const [, server, mediaId] = match;
+  if (!match?.[1] || !match?.[2]) throw new Error('Вложение имеет неверный Matrix URI.');
+  const server = match[1];
+  const mediaId = match[2];
   return (
     client.getHomeserverUrl().replace(/\/$/, '') +
     '/_matrix/client/v1/media/download/' +
@@ -95,7 +96,7 @@ export async function downloadEncryptedAttachment(
   const response = await fetch(authenticatedMediaUrl(client, file.url), {
     headers: { Authorization: 'Bearer ' + token },
   });
-  if (!response.ok()) throw new Error('Недоступны зашифрованные данные файла.');
+  if (!response.ok) throw new Error('Недоступны зашифрованные данные файла.');
   const ciphertext = await response.arrayBuffer();
   if (ciphertext.byteLength > MAX_ATTACHMENT_BYTES + 4096)
     throw new Error('Слишком большой зашифрованный файл.');

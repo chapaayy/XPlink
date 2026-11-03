@@ -1,5 +1,5 @@
 import type { MatrixClient, Room } from 'matrix-js-sdk';
-import { Preset, Visibility } from 'matrix-js-sdk';
+import { EventType, Preset, Visibility } from 'matrix-js-sdk';
 import { createEncryptedRoom } from './rooms';
 
 export interface SpaceSummary {
@@ -43,7 +43,7 @@ async function linkChild(client: MatrixClient, parentId: string, childId: string
     throw new Error('Родительское пространство не доступно.');
   }
   // Space linkage is Matrix state and subject to Synapse state-event power levels.
-  await client.sendStateEvent(parentId, 'm.space.child', { via: [serverFromId(childId)] }, childId);
+  await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [serverFromId(childId)] }, childId);
   await client.sendStateEvent(
     childId,
     'm.space.parent',

@@ -1,11 +1,11 @@
 import type { MatrixClient } from 'matrix-js-sdk';
-import { Preset, Visibility } from 'matrix-js-sdk';
+import { EventType, Preset, Visibility } from 'matrix-js-sdk';
 import { assertEncryptedRoom } from './crypto';
 
 type DirectMap = Record<string, string[]>;
 
 export function directRoomMap(client: MatrixClient): DirectMap {
-  const raw = client.getAccountData('m.direct')?.getContent();
+  const raw = client.getAccountData(EventType.Direct)?.getContent();
   if (!raw || typeof raw !== 'object') return {};
   const map: DirectMap = {};
   for (const [userId, ids] of Object.entries(raw)) {
@@ -21,7 +21,7 @@ export function directRoomIds(client: MatrixClient): Set<string> {
 async function recordDirect(client: MatrixClient, userId: string, roomId: string): Promise<void> {
   const map = directRoomMap(client);
   map[userId] = [...new Set([...(map[userId] ?? []), roomId])];
-  await client.setAccountData('m.direct', map);
+  await client.setAccountData(EventType.Direct, map);
 }
 
 export async function createDirectChat(client: MatrixClient, userId: string): Promise<string> {
