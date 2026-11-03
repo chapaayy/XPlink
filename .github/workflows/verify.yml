@@ -1,4 +1,4 @@
-name: Verify XPlink stage 1
+name: Verify XPlink stages 1 and 2
 on:
   pull_request:
   workflow_dispatch:
