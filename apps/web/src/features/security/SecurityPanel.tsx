@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
+import type { VerificationRequest } from 'matrix-js-sdk/lib/crypto-api';
 import type { SecretStorageAccess } from '@xplink/matrix-adapter';
 import { RecoveryControls } from './RecoveryControls';
 import { DeviceControls } from './DeviceControls';
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export function SecurityPanel({ client, secretAccess, roomId, revision }: Props) {
+  const [outgoingRequest, setOutgoingRequest] = useState<VerificationRequest | null>(null);
   return (
     <>
       <header>
@@ -21,8 +24,13 @@ export function SecurityPanel({ client, secretAccess, roomId, revision }: Props)
       </header>
       <RecoveryControls client={client} secretAccess={secretAccess} />
       <DeviceControls client={client} />
-      <VerificationControls client={client} />
-      <RoomTrust client={client} roomId={roomId} revision={revision} />
+      <VerificationControls client={client} outgoingRequest={outgoingRequest} />
+      <RoomTrust
+        client={client}
+        roomId={roomId}
+        revision={revision}
+        onVerificationRequested={setOutgoingRequest}
+      />
     </>
   );
 }

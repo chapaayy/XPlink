@@ -4,7 +4,13 @@ import { CryptoEvent } from 'matrix-js-sdk/lib/crypto-api';
 import type { VerificationRequest } from 'matrix-js-sdk/lib/crypto-api';
 import { VerificationFlow, requestOwnVerification } from '@xplink/matrix-adapter';
 
-export function VerificationControls({ client }: { client: MatrixClient }) {
+export function VerificationControls({
+  client,
+  outgoingRequest,
+}: {
+  client: MatrixClient;
+  outgoingRequest: VerificationRequest | null;
+}) {
   const [flow, setFlow] = useState<VerificationFlow | null>(null);
   const [revision, setRevision] = useState(0);
   const [notice, setNotice] = useState('');
@@ -21,6 +27,13 @@ export function VerificationControls({ client }: { client: MatrixClient }) {
       client.off(CryptoEvent.VerificationRequestReceived, onRequest);
     };
   }, [client]);
+  useEffect(() => {
+    if (!outgoingRequest) return;
+    setFlow((old) => {
+      old?.dispose();
+      return new VerificationFlow(outgoingRequest, () => setRevision((n) => n + 1));
+    });
+  }, [outgoingRequest]);
   const invoke = async (fn: () => Promise<unknown>) => {
     setNotice('');
     try {

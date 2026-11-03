@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
+import type { VerificationRequest } from 'matrix-js-sdk/lib/crypto-api';
 import { roomIdentities, requestPeerVerification, removeRoomMember } from '@xplink/matrix-adapter';
 import type { PeerIdentity } from '@xplink/matrix-adapter';
 
@@ -7,9 +8,10 @@ interface Props {
   client: MatrixClient;
   roomId: string | null;
   revision: number;
+  onVerificationRequested: (request: VerificationRequest) => void;
 }
 
-export function RoomTrust({ client, roomId, revision }: Props) {
+export function RoomTrust({ client, roomId, revision, onVerificationRequested }: Props) {
   const [peers, setPeers] = useState<PeerIdentity[]>([]);
   const [notice, setNotice] = useState('');
   useEffect(() => {
@@ -54,7 +56,10 @@ export function RoomTrust({ client, roomId, revision }: Props) {
           <button
             onClick={() =>
               void requestPeerVerification(client, peer.userId, roomId)
-                .then(() => setNotice('Запрос проверки отправлен.'))
+                .then((request) => {
+                  onVerificationRequested(request);
+                  setNotice('Запрос проверки отправлен. Сравните код в разделе «Подтверждение устройств».');
+                })
                 .catch(() => setNotice('Не удалось запросить проверку.'))
             }
           >
