@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Render minimal localhost-only Synapse config after official image generated a signing key."""
 import json
+import os
 import secrets
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[2]
 data = root / '.local' / 'synapse'
-env = dict(line.split('=', 1) for line in (root / '.env').read_text().splitlines() if '=' in line and not line.startswith('#'))
+env = {key: os.environ[key] for key in ('MATRIX_SERVER_NAME', 'POSTGRES_PASSWORD') if key in os.environ}
+if len(env) != 2:
+    # The host-side script may also be used directly outside Docker.
+    fallback = dict(line.split('=', 1) for line in (root / '.env').read_text().splitlines() if '=' in line and not line.startswith('#'))
+    env = {**fallback, **env}
 assert env['MATRIX_SERVER_NAME'] == 'localhost', 'stage 1 is localhost-only'
 assert (data / 'localhost.signing.key').exists(), 'run scripts/init-dev.sh first'
 assert not (data / '.xplink-configured').exists(), 'refusing to overwrite generated credentials'
