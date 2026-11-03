@@ -85,5 +85,9 @@ export async function requestPeerVerification(
   if (!room || !crypto || room.getMyMembership() !== 'join') {
     throw new Error('Для сверки личности нужен общий доступный канал.');
   }
-  return crypto.requestVerificationDM(userId, roomId);
+  const devices = await crypto.getUserDeviceInfo([userId], true);
+  const target = devices.get(userId);
+  const deviceId = target?.keys().next().value;
+  if (!deviceId) throw new Error('У собеседника нет доступных E2EE-устройств.');
+  return crypto.requestDeviceVerification(userId, deviceId);
 }
