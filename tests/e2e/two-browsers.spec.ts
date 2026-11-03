@@ -67,9 +67,12 @@ test('two independent browsers exchange E2EE ciphertext; Synapse does not see te
       alice.locator('.connection-screen p').first().textContent({ timeout: 1500 }),
       bob.locator('.connection-screen p').first().textContent({ timeout: 1500 }),
     ]);
-    console.error('Connection states:', states.map((result) =>
-      result.status === 'fulfilled' ? result.value : '(not on connection screen)',
-    ));
+    console.error(
+      'Connection states:',
+      states.map((result) =>
+        result.status === 'fulfilled' ? result.value : '(not on connection screen)',
+      ),
+    );
     throw error;
   }
   await Promise.all([a.close(), b.close()]);
