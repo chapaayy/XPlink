@@ -73,7 +73,8 @@ test('kicked user cannot fetch a new encrypted event', async ({ browser, request
       '/_matrix/client/v3/rooms/' + roomPath + '/event/' + encodeURIComponent(encrypted.event_id),
       { headers: { Authorization: 'Bearer ' + oldToken } },
     );
-    expect(forbidden.status()).toBe(403);
+    // Synapse may return 404 to avoid revealing whether the event exists.
+    expect([403, 404]).toContain(forbidden.status());
   } finally {
     await Promise.allSettled([a.close(), b.close()]);
   }
