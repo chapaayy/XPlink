@@ -1,0 +1,5 @@
+# Stage 1 owners; security-sensitive changes require deliberate review.
+* @chapaayy
+/packages/matrix-adapter/ @chapaayy
+/services/synapse/ @chapaayy
+/.github/ @chapaayy

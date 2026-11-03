@@ -1,0 +1,71 @@
+name: xplink-dev
+services:
+  postgres:
+    image: postgres:17.7-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: synapse
+      POSTGRES_DB: synapse
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?create .env using scripts/init-dev.sh}
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=C'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U synapse -d synapse']
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    networks: [internal]
+
+  synapse:
+    image: matrixdotorg/synapse:v1.163.0
+    restart: unless-stopped
+    environment:
+      SYNAPSE_SERVER_NAME: ${MATRIX_SERVER_NAME:?set MATRIX_SERVER_NAME}
+      SYNAPSE_REPORT_STATS: 'no'
+      SYNAPSE_CONFIG_PATH: /data/homeserver.yaml
+    volumes:
+      - ../.local/synapse:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'python -c ''import urllib.request; urllib.request.urlopen("http://localhost:8008/_matrix/client/versions", timeout=3)'' || exit 1',
+        ]
+      interval: 8s
+      timeout: 6s
+      retries: 25
+      start_period: 20s
+    networks: [internal]
+
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      synapse:
+        condition: service_healthy
+    networks: [internal]
+
+  caddy:
+    image: caddy:2.11.7-alpine
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8080:8080'
+    volumes:
+      - ../services/caddy/Caddyfile.dev:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - web
+      - synapse
+    networks: [internal]
+
+volumes:
+  postgres-data:
+
+networks:
+  internal:
+    internal: false

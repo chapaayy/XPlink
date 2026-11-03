@@ -1,0 +1,266 @@
+[
+  {
+    "path": ".github/workflows/lockfile.yml",
+    "purpose": "Bootstrap lockfile and formatting on feature branch",
+    "contract": "GHA workflow",
+    "dependencies": "pnpm + Prettier",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": ".github/workflows/verify.yml",
+    "purpose": "CI quality and real E2EE test",
+    "contract": "GHA workflow",
+    "dependencies": "Docker + pnpm",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/Dockerfile",
+    "purpose": "Dev configuration and supporting module",
+    "contract": "file-level interface",
+    "dependencies": "XPlink configuration",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/app/App.tsx",
+    "purpose": "Auth/session UI switch",
+    "contract": "App",
+    "dependencies": "React + adapter",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/app/use-matrix.ts",
+    "purpose": "Own crypto lifecycle and Matrix subscriptions",
+    "contract": "useMatrix()",
+    "dependencies": "React + Matrix SDK",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/features/auth/LoginForm.tsx",
+    "purpose": "Credential form UI",
+    "contract": "LoginForm",
+    "dependencies": "React",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/features/channels/CreateRoomForm.tsx",
+    "purpose": "Private E2EE room creation form",
+    "contract": "CreateRoomForm",
+    "dependencies": "adapter + React",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/features/channels/RoomList.tsx",
+    "purpose": "Matrix room navigation/invites",
+    "contract": "RoomList",
+    "dependencies": "adapter + React",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/features/messages/Composer.tsx",
+    "purpose": "Fail-closed message form",
+    "contract": "Composer",
+    "dependencies": "adapter + React",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/features/messages/MessageTimeline.tsx",
+    "purpose": "Render decrypted messages only",
+    "contract": "MessageTimeline",
+    "dependencies": "adapter + React",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/layouts/AppShell.tsx",
+    "purpose": "Minimal Discord-style layout",
+    "contract": "AppShell",
+    "dependencies": "React + adapter",
+    "test": "E2E",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/src/main.tsx",
+    "purpose": "React entrypoint",
+    "contract": "boot React App",
+    "dependencies": "React DOM",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "apps/web/vite.config.ts",
+    "purpose": "Dev configuration and supporting module",
+    "contract": "file-level interface",
+    "dependencies": "XPlink configuration",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "deploy/compose.dev.yml",
+    "purpose": "Persisted dev infrastructure",
+    "contract": "docker compose",
+    "dependencies": "Docker",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/client.ts",
+    "purpose": "Construct one Rust Crypto Matrix client",
+    "contract": "initializeMatrix",
+    "dependencies": "matrix-js-sdk",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/crypto.test.ts",
+    "purpose": "Negative E2EE upload gates",
+    "contract": "Vitest tests",
+    "dependencies": "Vitest",
+    "test": "unit/security",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/crypto.ts",
+    "purpose": "Fail-closed encrypted room enforcement",
+    "contract": "assertEncryptedRoom",
+    "dependencies": "Matrix CryptoApi",
+    "test": "unit/security",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/index.ts",
+    "purpose": "Single public adapter boundary",
+    "contract": "exports",
+    "dependencies": "local adapter modules",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/messages.ts",
+    "purpose": "Send only to confirmed E2EE room",
+    "contract": "sendEncryptedMessage",
+    "dependencies": "crypto + matrix-js-sdk",
+    "test": "unit/security",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/rooms.test.ts",
+    "purpose": "Initial-state encryption tests",
+    "contract": "Vitest tests",
+    "dependencies": "Vitest",
+    "test": "unit/security",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/rooms.ts",
+    "purpose": "Room creation and invitations",
+    "contract": "createEncryptedRoom/listRooms/acceptRoomInvite",
+    "dependencies": "matrix-js-sdk",
+    "test": "unit/security",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/session.ts",
+    "purpose": "Login and session token lifetime",
+    "contract": "passwordLogin/readSession/storeSession/clearSession",
+    "dependencies": "matrix-js-sdk + browser sessionStorage",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/tab-lock.ts",
+    "purpose": "Exclusive crypto store ownership",
+    "contract": "acquireCryptoTab",
+    "dependencies": "navigator.locks",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/timeline.ts",
+    "purpose": "Map SDK events to safe UI objects",
+    "contract": "roomMessages",
+    "dependencies": "matrix-js-sdk",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "playwright.config.ts",
+    "purpose": "Dev configuration and supporting module",
+    "contract": "file-level interface",
+    "dependencies": "XPlink configuration",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "scripts/generate-file-index.mjs",
+    "purpose": "Deterministic FILE_INDEX renderer",
+    "contract": "node CLI",
+    "dependencies": "file-manifest.json",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "scripts/healthcheck.sh",
+    "purpose": "HTTP readiness check",
+    "contract": "bash healthcheck.sh",
+    "dependencies": "curl",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "scripts/init-dev.sh",
+    "purpose": "Create dev secrets and signing key",
+    "contract": "bash init-dev.sh",
+    "dependencies": "Docker + Python",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "scripts/verify-repo-map.mjs",
+    "purpose": "Require docs metadata for all source",
+    "contract": "node CLI",
+    "dependencies": "file-manifest.json",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "scripts/verify-repo-map.test.mjs",
+    "purpose": "Check file index smoke",
+    "contract": "node test",
+    "dependencies": "Node stdlib",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "services/caddy/Caddyfile.dev",
+    "purpose": "Proxy only Matrix client endpoints / Vite",
+    "contract": "localhost :8080",
+    "dependencies": "Caddy",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "services/synapse/render_config.py",
+    "purpose": "Generate secrets once; write localhost homeserver config",
+    "contract": "CLI render",
+    "dependencies": "Python stdlib",
+    "test": "docs:check / CI",
+    "review": "2026-11-03"
+  },
+  {
+    "path": "tests/e2e/two-browsers.spec.ts",
+    "purpose": "Independent browsers and ciphertext API assertion",
+    "contract": "Playwright test",
+    "dependencies": "Synapse + browser",
+    "test": "E2E",
+    "review": "2026-11-03"
+  }
+]
