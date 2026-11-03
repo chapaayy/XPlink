@@ -4,7 +4,7 @@
 
 | Этап                    | Результат                                                                                           | Статус                                                           |
 | ----------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| 1. Каркас и E2EE        | Docker Synapse/Postgres/Caddy, React, два аккаунта и защищённый канал, ciphertext test, CI, restart | Код создан; приёмка требует зелёного Docker E2E в GitHub Actions |
+| 1. Каркас и E2EE        | Docker Synapse/Postgres/Caddy, React, два аккаунта и защищённый канал, ciphertext test, CI, restart | Принято: CI quality/E2EE зелёные, restart подтверждён            |
 | 2. Идентичность и ключи | Trust, verification, cross-signing, recovery и второй девайс                                        | Не начат                                                         |
 | 3. Текстовый продукт    | Spaces, роли, DMs, реакции, вложения, серверные permissions                                         | Не начат                                                         |
 | 4. RTC                  | MatrixRTC/LiveKit/видео/демонстрация экрана с отдельным E2EE тестом                                 | Не начат                                                         |
@@ -12,3 +12,5 @@
 | 6. Hardening            | HTTPS, независимый аудит, prod deploy, backup/restore, load                                         | Не начат                                                         |
 
 **Приёмка этапа 1:** разные browser contexts меняются сообщением; Synapse возвращает `m.room.encrypted` без test plaintext; `pnpm` checks в CI; docs index актуален; PostgreSQL и Synapse ключи переживают restart. Пока хотя бы один из этих пунктов не прошёл реальный тест — этап не считать принятым. Не выдавать этот прототип за production.
+
+**Результат первой приёмки (2026-11-03, UTC):** GitHub Actions [run #41711889621](https://github.com/chapaayy/XPlink/actions/runs/41711889621): `quality` успешно, реальный Playwright E2EE-тест успешно (4,9 сек), шифротекст в Matrix API подтверждён, перезапуск PostgreSQL/Synapse сохранил комнату. Коммит исправления dev-CSP: `6f574aa`. Приёмка относится исключительно к локальному прототипу и не включает production-аудит, восстановление ключей или проверку устройств.
