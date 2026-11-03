@@ -6,6 +6,7 @@ import { sendEncryptedMessage } from './messages';
 function fakeClient(encrypted: boolean, initialized: boolean) {
   const sendEvent = vi.fn();
   const client = {
+    getUserId: () => '@self:localhost',
     getRoom: () => ({
       getMyMembership: () => 'join',
       hasEncryptionStateEvent: () => encrypted,
