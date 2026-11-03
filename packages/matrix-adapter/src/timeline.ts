@@ -18,7 +18,7 @@ export function roomMessages(client: MatrixClient, roomId: string): ChatMessage[
     .getEvents()
     .filter((event) => {
       return (
-        event.getType() === EventType.RoomMessage || event.getWireType() === EventType.RoomEncrypted
+        event.getType() === EventType.RoomMessage || event.getWireType() === 'm.room.encrypted'
       );
     })
     .map((event) => {
