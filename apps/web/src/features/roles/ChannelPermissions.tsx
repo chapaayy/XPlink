@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
 import {
   assignChannelRole,
+  isRoomCreator,
   setChannelReadOnly,
   isReadOnly,
   userLevel,
@@ -76,10 +77,11 @@ export function ChannelPermissions({ client, roomId, revision }: Props) {
       <div className="permission-members">
         {members.map((member) => {
           const level = userLevel(client, roomId, member.userId);
+        const creator = isRoomCreator(client, roomId, member.userId);
           const role: ChannelRole = level >= 100 ? 'admin' : level >= 50 ? 'moderator' : 'member';
           return (
             <div key={member.userId} className="permission-member">
-              <strong>{member.userId}</strong>
+              <strong>{member.userId}{creator ? ' · Создатель' : ''}</strong>
               <select
                 aria-label={'Роль ' + member.userId}
                 value={role}

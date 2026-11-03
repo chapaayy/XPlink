@@ -31,33 +31,11 @@ export function childRoomIds(client: MatrixClient, spaceId: string): string[] {
     .filter((id) => !!id && client.getRoom(id)?.getMyMembership() === 'join');
 }
 
-function serverFromId(id: string): string {
-  const index = id.indexOf(':');
-  if (index < 0 || index === id.length - 1) throw new Error('Неверный Matrix ID.');
-  return id.slice(index + 1);
-}
-
-/** Classify SDK errors without exposing room identifiers, response bodies, or token-bearing URLs. */
-function classifyStateFailure(error: unknown): string {
-  const data = error && typeof error === 'object'
-    ? error as { errcode?: unknown; data?: { errcode?: unknown }; httpStatus?: unknown; statusCode?: unknown; message?: unknown }
-    : {};
-  const code = data.errcode ?? data.data?.errcode;
-  if (typeof code === 'string' && /^M_[A-Z_]+$/.test(code)) return code;
-  const status = data.httpStatus ?? data.statusCode;
-  if (typeof status === 'number' && status >= 400 && status < 600) return 'HTTP_' + status;
-  const message = typeof data.message === 'string' ? data.message : '';
-  if (/M_FORBIDDEN/i.test(message)) return 'M_FORBIDDEN';
-  if (/M_BAD_JSON/i.test(message)) return 'M_BAD_JSON';
-  if (/M_NOT_FOUND/i.test(message)) return 'M_NOT_FOUND';
-  if (/M_INVALID_PARAM/i.test(message)) return 'M_INVALID_PARAM';
-  if (/M_UNRECOGNIZED/i.test(message)) return 'M_UNRECOGNIZED';
-  if (/forbidden|permission|not allowed/i.test(message)) return 'AUTHORIZATION';
-  if (/undefined|null|not a function/i.test(message)) return 'CLIENT_STATE';
-  if (/room.*not found|unknown room/i.test(message)) return 'MISSING_ROOM';
-  if (/encrypt|crypto/i.test(message)) return 'ENCRYPTION';
-  if (/event_id.*absent/i.test(message)) return 'MISSING_EVENT_ID';
-  return 'UNKNOWN';
+/** Matrix v12 room IDs are opaque; never derive server names from a room ID. */
+function localVia(client: MatrixClient): string {
+  const domain = client.getDomain();
+  if (!domain) throw new Error('LOCAL_HOMESERVER_UNAVAILABLE');
+  return domain;
 }
 
 async function linkChild(client: MatrixClient, parentId: string, childId: string): Promise<void> {
@@ -67,7 +45,7 @@ async function linkChild(client: MatrixClient, parentId: string, childId: string
   }
   // Space linkage is Matrix state and subject to Synapse state-event power levels.
   try {
-    await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [serverFromId(childId)] }, childId);
+    await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [localVia(client)] }, childId);
   } catch (error) {
     throw new Error('SPACE_CHILD_EVENT_' + classifyStateFailure(error));
   }
@@ -75,7 +53,7 @@ async function linkChild(client: MatrixClient, parentId: string, childId: string
     await client.sendStateEvent(
       childId,
       EventType.SpaceParent,
-      { via: [serverFromId(parentId)], canonical: true },
+      { via: [localVia(client)], canonical: true },
       parentId,
     );
   } catch (error) {
