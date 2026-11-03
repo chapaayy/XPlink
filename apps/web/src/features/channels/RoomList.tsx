@@ -7,14 +7,21 @@ interface Props {
   selectedRoomId: string | null;
   onSelect: (id: string) => void;
   revision: number;
+  roomIds?: string[];
+  hideRoomIds?: string[];
+  showInvites?: boolean;
 }
 
-export function RoomList({ client, selectedRoomId, onSelect, revision }: Props) {
+export function RoomList({ client, selectedRoomId, onSelect, revision, roomIds, hideRoomIds, showInvites = true }: Props) {
   const [error, setError] = useState('');
   void revision; // dependent on event revision: re-render when sync/timeline changes
   return (
     <nav aria-label="Каналы">
-      {listRooms(client).map((room) => (
+      {listRooms(client)
+        .filter((room) => roomIds ? roomIds.includes(room.id) :
+          !hideRoomIds?.includes(room.id) && (room.encrypted || (showInvites && room.membership === 'invite')))
+        .filter((room) => showInvites || room.membership !== 'invite')
+        .map((room) => (
         <div className="room-entry" key={room.id}>
           {room.membership === 'invite' ? (
             <button
