@@ -50,3 +50,4 @@
 | `apps/web/src/features/security/RoomTrust.tsx` | Room member identity warnings and moderation actions | RoomTrust | identity adapter | identity.test.ts | 2026-11-04 |
 | `apps/web/src/features/security/SecurityPanel.tsx` | Compose security settings by feature responsibility | SecurityPanel | React features | CI build | 2026-11-04 |
 | `tests/e2e/recovery-devices.spec.ts` | Real browser recovery and session revocation acceptance | Playwright E2E | Synapse + browser | CI e2ee | 2026-11-04 |
+| `.github/workflows/stage2-format.yml` | Format stage 2 branch without altering stage 1 or main | GHA on feature push | pnpm + Prettier | CI | 2026-11-04 |
