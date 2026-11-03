@@ -374,5 +374,13 @@
     "dependencies": "pnpm + Prettier",
     "test": "CI",
     "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/sas-verification.spec.ts",
+    "purpose": "Two independent Matrix devices complete human-confirmed SAS verification",
+    "contract": "Playwright E2E",
+    "dependencies": "Synapse + Rust Crypto + browser",
+    "test": "CI e2ee",
+    "review": "2026-11-04"
   }
 ]

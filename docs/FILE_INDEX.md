@@ -51,3 +51,4 @@
 | `apps/web/src/features/security/SecurityPanel.tsx` | Compose security settings by feature responsibility | SecurityPanel | React features | CI build | 2026-11-04 |
 | `tests/e2e/recovery-devices.spec.ts` | Real browser recovery and session revocation acceptance | Playwright E2E | Synapse + browser | CI e2ee | 2026-11-04 |
 | `.github/workflows/stage2-format.yml` | Format stage 2 branch without altering stage 1 or main | GHA on feature push | pnpm + Prettier | CI | 2026-11-04 |
+| `tests/e2e/sas-verification.spec.ts` | Two independent Matrix devices complete human-confirmed SAS verification | Playwright E2E | Synapse + Rust Crypto + browser | CI e2ee | 2026-11-04 |
