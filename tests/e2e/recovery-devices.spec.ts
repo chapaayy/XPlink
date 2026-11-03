@@ -79,14 +79,20 @@ test('second device restores backed-up E2EE history and revokes the first sessio
 
     await second.getByRole('button', { name: 'Безопасность и устройства' }).click();
     await second.getByLabel('Пароль для отзыва устройства').fill(password);
+    // The Synapse registration account may own additional devices.
+    // Revoke the exact original browser device instead of assuming only two exist.
+    const previous = second.locator('.device-item').filter({ hasText: auth.deviceId });
+    await expect(previous).toBeVisible();
     second.once('dialog', (dialog) => void dialog.accept());
-    await second.getByRole('button', { name: 'Отозвать сессию' }).first().click();
-    await expect(second.getByRole('button', { name: 'Отозвать сессию' })).toHaveCount(0);
+    await previous.getByRole('button', { name: 'Отозвать сессию' }).click();
+    await expect(previous).toHaveCount(0);
 
-    const whoami = await request.get('/_matrix/client/v3/account/whoami', {
-      headers: { Authorization: 'Bearer ' + auth.accessToken },
-    });
-    expect(whoami.status()).toBe(401);
+    await expect.poll(async () => {
+      const whoami = await request.get('/_matrix/client/v3/account/whoami', {
+        headers: { Authorization: 'Bearer ' + auth.accessToken },
+      });
+      return whoami.status();
+    }, { timeout: 15_000 }).toBe(401);
   } finally {
     await Promise.allSettled([firstCtx.close(), secondCtx.close()]);
   }
