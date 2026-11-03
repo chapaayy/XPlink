@@ -90,41 +90,55 @@ describe('stage 3: server authorization and encrypted media safety', () => {
     const parent = {
       getMyMembership: () => 'join',
       currentState: {
-        getStateEvents: (type: string) => type === 'm.room.create'
-          ? { getContent: () => ({ type: 'm.space', room_version: '12' }) }
-          : null,
+        getStateEvents: (type: string) =>
+          type === 'm.room.create'
+            ? { getContent: () => ({ type: 'm.space', room_version: '12' }) }
+            : null,
       },
     };
     const subject = {
       getCrypto: () => ({}),
       getDomain: () => 'localhost',
       createRoom: async () => ({ room_id: '!opaque-no-server-name' }),
-      getRoom: (id: string) => id === '!opaque-parent' ? parent : null,
+      getRoom: (id: string) => (id === '!opaque-parent' ? parent : null),
       sendStateEvent,
     } as unknown as MatrixClient;
-    await expect(createCategory(subject, '!opaque-parent', 'Design'))
-      .resolves.toBe('!opaque-no-server-name');
-    expect(sendStateEvent).toHaveBeenNthCalledWith(1,
-      '!opaque-parent', EventType.SpaceChild, { via: ['localhost'] }, '!opaque-no-server-name');
-    expect(sendStateEvent).toHaveBeenNthCalledWith(2,
-      '!opaque-no-server-name', EventType.SpaceParent,
-      { via: ['localhost'], canonical: true }, '!opaque-parent');
+    await expect(createCategory(subject, '!opaque-parent', 'Design')).resolves.toBe(
+      '!opaque-no-server-name',
+    );
+    expect(sendStateEvent).toHaveBeenNthCalledWith(
+      1,
+      '!opaque-parent',
+      EventType.SpaceChild,
+      { via: ['localhost'] },
+      '!opaque-no-server-name',
+    );
+    expect(sendStateEvent).toHaveBeenNthCalledWith(
+      2,
+      '!opaque-no-server-name',
+      EventType.SpaceParent,
+      { via: ['localhost'], canonical: true },
+      '!opaque-parent',
+    );
   });
 
   it('respects immutable room-v12 creators without overriding demoted v11 creators', () => {
     const current = (version: string) => ({
       currentState: {
-        getStateEvents: (type: string) => type === 'm.room.create'
-          ? {
-              getSender: () => '@alice:localhost',
-              getContent: () => ({ room_version: version }),
-            }
-          : { getContent: () => ({
-              users: { '@alice:localhost': 0 },
-              users_default: 0,
-              events_default: 0,
-              events: { 'm.room.encrypted': 50 },
-            }) },
+        getStateEvents: (type: string) =>
+          type === 'm.room.create'
+            ? {
+                getSender: () => '@alice:localhost',
+                getContent: () => ({ room_version: version }),
+              }
+            : {
+                getContent: () => ({
+                  users: { '@alice:localhost': 0 },
+                  users_default: 0,
+                  events_default: 0,
+                  events: { 'm.room.encrypted': 50 },
+                }),
+              },
       },
     });
     const v12 = { getRoom: () => current('12') } as unknown as MatrixClient;

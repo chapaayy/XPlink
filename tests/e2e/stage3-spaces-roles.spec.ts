@@ -31,12 +31,19 @@ test('space categories link E2EE channels and Synapse enforces readonly/role per
     // Observe only status and Matrix error identifier, never request/response bodies.
     alice.on('response', (response) => {
       if (!response.url().includes('/state/m.space.child/')) return;
-      void response.json().then((payload: { errcode?: string }) => {
-        console.error('Space child Matrix HTTP status:', response.status(),
-          'errcode:', payload.errcode ?? 'none');
-      }).catch(() => {
-        console.error('Space child Matrix HTTP status:', response.status());
-      });
+      void response
+        .json()
+        .then((payload: { errcode?: string }) => {
+          console.error(
+            'Space child Matrix HTTP status:',
+            response.status(),
+            'errcode:',
+            payload.errcode ?? 'none',
+          );
+        })
+        .catch(() => {
+          console.error('Space child Matrix HTTP status:', response.status());
+        });
     });
     await alice.getByLabel('Тип элемента').selectOption('category');
     await alice.locator('#space-new-name').fill('Design');

@@ -136,7 +136,10 @@ export function ChannelPermissions({ client, roomId, revision }: Props) {
           const role: ChannelRole = level >= 100 ? 'admin' : level >= 50 ? 'moderator' : 'member';
           return (
             <div key={member.userId} className="permission-member">
-              <strong>{member.userId}{creator ? ' · Создатель' : ''}</strong>
+              <strong>
+                {member.userId}
+                {creator ? ' · Создатель' : ''}
+              </strong>
               <select
                 aria-label={'Роль ' + member.userId}
                 value={pendingRoles[member.userId] ?? role}

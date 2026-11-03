@@ -28,11 +28,13 @@ export function isRoomCreator(client: MatrixClient, roomId: string, userId: stri
   if (!event) return false;
   const content = event.getContent();
   const roomVersion = content.room_version;
-  const version = typeof roomVersion === 'string' && /^\d+$/.test(roomVersion)
-    ? Number(roomVersion) : 1;
+  const version =
+    typeof roomVersion === 'string' && /^\d+$/.test(roomVersion) ? Number(roomVersion) : 1;
   if (version < 12) return false;
-  return event.getSender() === userId ||
-    (Array.isArray(content.additional_creators) && content.additional_creators.includes(userId));
+  return (
+    event.getSender() === userId ||
+    (Array.isArray(content.additional_creators) && content.additional_creators.includes(userId))
+  );
 }
 
 export function userLevel(client: MatrixClient, roomId: string, userId: string): number {
@@ -63,7 +65,8 @@ export async function assignChannelRole(
   userId: string,
   role: ChannelRole,
 ): Promise<void> {
-  if (isRoomCreator(client, roomId, userId)) throw new Error('Нельзя менять роль создателя комнаты.');
+  if (isRoomCreator(client, roomId, userId))
+    throw new Error('Нельзя менять роль создателя комнаты.');
   if (!client.getRoom(roomId)?.hasEncryptionStateEvent())
     throw new Error('Роли разрешены только в E2EE-каналах.');
   if (
