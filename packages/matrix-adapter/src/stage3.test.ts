@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { MatrixClient } from 'matrix-js-sdk';
+import { EventType } from 'matrix-js-sdk';
 import {
   sendEncryptedAttachment,
   MAX_ATTACHMENT_BYTES,
   downloadEncryptedAttachment,
 } from './attachments';
-import { createSpace } from './spaces';
-import { canWrite, setChannelReadOnly, userLevel } from './roles';
+import { createSpace, createCategory } from './spaces';
+import { canWrite, isRoomCreator, setChannelReadOnly, userLevel } from './roles';
 import { addReaction } from './reactions';
 
 const levels = {
@@ -83,5 +84,54 @@ describe('stage 3: server authorization and encrypted media safety', () => {
     const noCrypto = { getCrypto: () => null, createRoom: vi.fn() } as unknown as MatrixClient;
     await expect(createSpace(noCrypto, 'Team')).rejects.toThrow('Rust Crypto');
     expect(noCrypto.createRoom).not.toHaveBeenCalled();
+  });
+  it('links opaque Matrix v12 room IDs using the local homeserver rather than parsing a colon', async () => {
+    const sendStateEvent = vi.fn(async () => ({ event_id: '$ok' }));
+    const parent = {
+      getMyMembership: () => 'join',
+      currentState: {
+        getStateEvents: (type: string) => type === 'm.room.create'
+          ? { getContent: () => ({ type: 'm.space', room_version: '12' }) }
+          : null,
+      },
+    };
+    const subject = {
+      getCrypto: () => ({}),
+      getDomain: () => 'localhost',
+      createRoom: async () => ({ room_id: '!opaque-no-server-name' }),
+      getRoom: (id: string) => id === '!opaque-parent' ? parent : null,
+      sendStateEvent,
+    } as unknown as MatrixClient;
+    await expect(createCategory(subject, '!opaque-parent', 'Design'))
+      .resolves.toBe('!opaque-no-server-name');
+    expect(sendStateEvent).toHaveBeenNthCalledWith(1,
+      '!opaque-parent', EventType.SpaceChild, { via: ['localhost'] }, '!opaque-no-server-name');
+    expect(sendStateEvent).toHaveBeenNthCalledWith(2,
+      '!opaque-no-server-name', EventType.SpaceParent,
+      { via: ['localhost'], canonical: true }, '!opaque-parent');
+  });
+
+  it('respects immutable room-v12 creators without overriding demoted v11 creators', () => {
+    const current = (version: string) => ({
+      currentState: {
+        getStateEvents: (type: string) => type === 'm.room.create'
+          ? {
+              getSender: () => '@alice:localhost',
+              getContent: () => ({ room_version: version }),
+            }
+          : { getContent: () => ({
+              users: { '@alice:localhost': 0 },
+              users_default: 0,
+              events_default: 0,
+              events: { 'm.room.encrypted': 50 },
+            }) },
+      },
+    });
+    const v12 = { getRoom: () => current('12') } as unknown as MatrixClient;
+    const v11 = { getRoom: () => current('11') } as unknown as MatrixClient;
+    expect(isRoomCreator(v12, '!opaque', '@alice:localhost')).toBe(true);
+    expect(userLevel(v12, '!opaque', '@alice:localhost')).toBe(Number.POSITIVE_INFINITY);
+    expect(isRoomCreator(v11, '!old:localhost', '@alice:localhost')).toBe(false);
+    expect(userLevel(v11, '!old:localhost', '@alice:localhost')).toBe(0);
   });
 });
