@@ -41,22 +41,22 @@ test('private DM encrypts text, reactions and media; recipient decrypts attachme
 
     const secretFile = 'NO-PLAINTEXT-MEDIA-' + Date.now();
     const fileName = 'secret-stage3.txt';
-    let mediaUploadEncrypted = false;
-    alice.on('request', (req) => {
-      if (req.method() !== 'POST' || !req.url().includes('/upload')) return;
-      const bytes = req.postDataBuffer();
-      if (bytes) mediaUploadEncrypted = !bytes.includes(Buffer.from(secretFile));
-    });
     await alice.getByLabel('Зашифрованное вложение').setInputFiles({
       name: fileName,
       mimeType: 'text/plain',
       buffer: Buffer.from(secretFile),
     });
     await expect(bob.getByText(fileName)).toBeVisible({ timeout: 40_000 });
-    expect(mediaUploadEncrypted, 'media upload must not contain plaintext').toBe(true);
+    const ciphertextResponse = bob.waitForResponse((response) =>
+      response.url().includes('/media/download/') && response.status() === 200,
+    );
     const download = bob.waitForEvent('download');
     await bob.getByRole('button', { name: 'Скачать ' + fileName }).click();
     const item = await download;
+    const wireResponse = await ciphertextResponse;
+    const wireBytes = await wireResponse.body();
+    expect(wireBytes.length).toBeGreaterThan(0);
+    expect(wireBytes.includes(Buffer.from(secretFile)), 'server must deliver encrypted bytes').toBe(false);
     const data = await readFile(await item.path());
     expect(data.toString('utf8')).toBe(secretFile);
 

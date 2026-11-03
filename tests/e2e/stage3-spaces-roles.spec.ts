@@ -31,7 +31,13 @@ test('space categories link E2EE channels and Synapse enforces readonly/role per
     await alice.getByLabel('Тип элемента').selectOption('category');
     await alice.locator('#space-new-name').fill('Design');
     await alice.getByRole('button', { name: 'Создать', exact: true }).click();
-    await expect(alice.getByText('⌄ Design')).toBeVisible({ timeout: 20_000 });
+    try {
+      await expect(alice.getByText('⌄ Design')).toBeVisible({ timeout: 20_000 });
+    } catch (error) {
+      // Only generic UI status is inspected, never messages, keys or credentials.
+      console.error('Category creation status:', await alice.getByRole('alert').allTextContents());
+      throw error;
+    }
 
     await alice.getByLabel('Тип элемента').selectOption('channel');
     await alice.getByLabel('Категория канала').selectOption({ label: 'Design' });
