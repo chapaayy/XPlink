@@ -7,7 +7,7 @@ test('a second tab cannot open the same Rust Crypto store concurrently', async (
   const first = await context.newPage();
   try {
     await first.goto('/');
-    await first.getByLabel('Логин Matrix').fill('alice');
+    await first.getByLabel('Логин Matrix').fill('alicetab');
     await first.getByLabel('Пароль').fill(password);
     await first.getByRole('button', { name: 'Войти' }).click();
     await expect(first.getByText('Зашифрованные каналы')).toBeVisible();

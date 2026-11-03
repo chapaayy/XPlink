@@ -13,8 +13,8 @@ test('two independent devices compare SAS before marking peer identity verified'
   const bob = await b.newPage();
   try {
     for (const [page, name] of [
-      [alice, 'alice'],
-      [bob, 'bob'],
+      [alice, 'alicesas'],
+      [bob, 'bobsas'],
     ] as const) {
       await page.goto('/');
       await expect(page.getByLabel('Логин Matrix')).toBeVisible();
@@ -25,7 +25,7 @@ test('two independent devices compare SAS before marking peer identity verified'
     }
 
     await alice.getByLabel('Новый E2EE-канал').fill('SAS test channel');
-    await alice.getByLabel('Matrix ID участника').fill('@bob:localhost');
+    await alice.getByLabel('Matrix ID участника').fill('@bobsas:localhost');
     await alice.getByRole('button', { name: 'Создать защищённый канал' }).click();
     await expect(bob.getByRole('button', { name: /Принять приглашение/ })).toBeVisible();
     await bob.getByRole('button', { name: /Принять приглашение/ }).click();

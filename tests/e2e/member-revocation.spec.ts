@@ -10,8 +10,8 @@ test('kicked user cannot fetch a new encrypted event', async ({ browser, request
   const bob = await b.newPage();
   try {
     for (const [page, username] of [
-      [alice, 'alice'],
-      [bob, 'bob'],
+      [alice, 'alicemember'],
+      [bob, 'bobmember'],
     ] as const) {
       await page.goto('/');
       await page.getByLabel('Логин Matrix').fill(username);
@@ -21,7 +21,7 @@ test('kicked user cannot fetch a new encrypted event', async ({ browser, request
     }
 
     await alice.getByLabel('Новый E2EE-канал').fill('Membership test');
-    await alice.getByLabel('Matrix ID участника').fill('@bob:localhost');
+    await alice.getByLabel('Matrix ID участника').fill('@bobmember:localhost');
     await alice.getByRole('button', { name: 'Создать защищённый канал' }).click();
     await expect(bob.getByRole('button', { name: /Принять приглашение/ })).toBeVisible();
     await bob.getByRole('button', { name: /Принять приглашение/ }).click();
