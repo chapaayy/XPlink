@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
 import {
   assignChannelRole,
@@ -20,10 +20,67 @@ export function ChannelPermissions({ client, roomId, revision }: Props) {
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [invitee, setInvitee] = useState('');
+  const [requestedReadOnly, setRequestedReadOnly] = useState<boolean | null>(null);
+  const [pendingRoles, setPendingRoles] = useState<Record<string, ChannelRole>>({});
   void revision;
   const room = client.getRoom(roomId);
   const members = room?.getJoinedMembers() ?? [];
-  const readOnly = isReadOnly(client, roomId);
+  const serverReadOnly = isReadOnly(client, roomId);
+  const readOnly = requestedReadOnly ?? serverReadOnly;
+  // Keep the user's choice visible while waiting for the authoritative room-state echo.
+  useEffect(() => {
+    if (requestedReadOnly !== null && requestedReadOnly === serverReadOnly)
+      setRequestedReadOnly(null);
+  }, [requestedReadOnly, serverReadOnly, roomId]);
+  useEffect(() => {
+    setPendingRoles((current) => {
+      let changed = false;
+      const next = { ...current };
+      for (const [userId, choice] of Object.entries(current)) {
+        const level = userLevel(client, roomId, userId);
+        const actual: ChannelRole = level >= 100 ? 'admin' : level >= 50 ? 'moderator' : 'member';
+        if (actual === choice) {
+          delete next[userId];
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+  }, [client, roomId, revision]);
+  const changeReadOnly = async (value: boolean) => {
+    setRequestedReadOnly(value);
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      await setChannelReadOnly(client, roomId, value);
+      setNotice('Настройки применены сервером Matrix.');
+    } catch {
+      setRequestedReadOnly(null);
+      setError('Сервер отказал в изменении режима канала.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  const changeRole = async (userId: string, value: ChannelRole) => {
+    setPendingRoles((current) => ({ ...current, [userId]: value }));
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      await assignChannelRole(client, roomId, userId, value);
+      setNotice('Настройки применены сервером Matrix.');
+    } catch {
+      setPendingRoles((current) => {
+        const next = { ...current };
+        delete next[userId];
+        return next;
+      });
+      setError('Сервер отказал в изменении роли.');
+    } finally {
+      setBusy(false);
+    }
+  };
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true);
     setError('');
@@ -46,9 +103,7 @@ export function ChannelPermissions({ client, roomId, revision }: Props) {
           type="checkbox"
           checked={readOnly}
           disabled={busy}
-          onChange={(event) =>
-            void run(() => setChannelReadOnly(client, roomId, event.target.checked))
-          }
+          onChange={(event) => void changeReadOnly(event.target.checked)}
         />
         Только модераторы могут писать
       </label>
@@ -77,24 +132,17 @@ export function ChannelPermissions({ client, roomId, revision }: Props) {
       <div className="permission-members">
         {members.map((member) => {
           const level = userLevel(client, roomId, member.userId);
-        const creator = isRoomCreator(client, roomId, member.userId);
+          const creator = isRoomCreator(client, roomId, member.userId);
           const role: ChannelRole = level >= 100 ? 'admin' : level >= 50 ? 'moderator' : 'member';
           return (
             <div key={member.userId} className="permission-member">
               <strong>{member.userId}{creator ? ' · Создатель' : ''}</strong>
               <select
                 aria-label={'Роль ' + member.userId}
-                value={role}
-                disabled={busy}
+                value={pendingRoles[member.userId] ?? role}
+                disabled={busy || creator}
                 onChange={(event) =>
-                  void run(() =>
-                    assignChannelRole(
-                      client,
-                      roomId,
-                      member.userId,
-                      event.target.value as ChannelRole,
-                    ),
-                  )
+                  void changeRole(member.userId, event.target.value as ChannelRole)
                 }
               >
                 <option value="member">Участник</option>
