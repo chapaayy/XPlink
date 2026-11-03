@@ -6,7 +6,10 @@ export interface PeerIdentity {
   changed: boolean;
 }
 
-export async function roomIdentities(client: MatrixClient, roomId: string): Promise<PeerIdentity[]> {
+export async function roomIdentities(
+  client: MatrixClient,
+  roomId: string,
+): Promise<PeerIdentity[]> {
   const crypto = client.getCrypto();
   const room = client.getRoom(roomId);
   if (!crypto || !room) throw new Error('Нет Matrix Crypto или комнаты.');
@@ -27,7 +30,10 @@ export async function roomIdentities(client: MatrixClient, roomId: string): Prom
 }
 
 /** Changing an already known identity must be acknowledged by actual verification. */
-export async function assertStableRoomIdentities(client: MatrixClient, roomId: string): Promise<void> {
+export async function assertStableRoomIdentities(
+  client: MatrixClient,
+  roomId: string,
+): Promise<void> {
   const peers = await roomIdentities(client, roomId);
   if (peers.some((peer) => peer.changed)) {
     throw new Error('Идентичность участника изменилась: перепроверьте его перед отправкой.');

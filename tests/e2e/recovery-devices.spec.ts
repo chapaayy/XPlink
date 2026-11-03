@@ -28,30 +28,36 @@ test('second device restores backed-up E2EE history and revokes the first sessio
     if (!recoveryKey) throw new Error('Recovery key missing');
     await first.getByRole('button', { name: 'Я сохранил ключ' }).click();
 
-    const roomName = 'Recovery-'+Date.now();
+    const roomName = 'Recovery-' + Date.now();
     await first.getByLabel('Новый E2EE-канал').fill(roomName);
     await first.getByRole('button', { name: 'Создать защищённый канал' }).click();
-    const message = 'RECOVER-HISTORY-'+Date.now();
+    const message = 'RECOVER-HISTORY-' + Date.now();
     await first.getByRole('textbox', { name: 'Сообщение' }).fill(message);
     await first.getByRole('button', { name: 'Отправить' }).click();
     await expect(first.getByText(message)).toBeVisible();
 
     const auth = await first.evaluate(() => {
       const session = JSON.parse(sessionStorage.getItem('xplink.matrix.session.v1') ?? '{}') as {
-        accessToken?: string; deviceId?: string;
+        accessToken?: string;
+        deviceId?: string;
       };
       return session;
     });
     expect(auth.accessToken).toBeTruthy();
     const backupUrl = '/_matrix/client/v3/room_keys/version';
-    await expect.poll(async () => {
-      const response = await request.get(backupUrl, {
-        headers: { Authorization: 'Bearer ' + auth.accessToken },
-      });
-      if (!response.ok()) return 0;
-      const data = (await response.json()) as { count?: number };
-      return data.count ?? 0;
-    }, { timeout: 60_000 }).toBeGreaterThan(0);
+    await expect
+      .poll(
+        async () => {
+          const response = await request.get(backupUrl, {
+            headers: { Authorization: 'Bearer ' + auth.accessToken },
+          });
+          if (!response.ok()) return 0;
+          const data = (await response.json()) as { count?: number };
+          return data.count ?? 0;
+        },
+        { timeout: 60_000 },
+      )
+      .toBeGreaterThan(0);
 
     await second.goto('/');
     await second.getByLabel('Логин Matrix').fill('carol');
@@ -61,7 +67,9 @@ test('second device restores backed-up E2EE history and revokes the first sessio
     await second.getByRole('button', { name: 'Безопасность и устройства' }).click();
     await second.getByLabel('Recovery key для нового устройства').fill(recoveryKey);
     await second.getByRole('button', { name: 'Восстановить историю и доверие' }).click();
-    await expect(second.getByRole('status').getByText(/Восстановлено ключей/)).toBeVisible({ timeout: 45_000 });
+    await expect(second.getByRole('status').getByText(/Восстановлено ключей/)).toBeVisible({
+      timeout: 45_000,
+    });
 
     // Reload replays history using the restored local Megolm keys.
     await second.reload();

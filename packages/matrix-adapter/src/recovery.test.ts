@@ -18,10 +18,15 @@ describe('recovery keys and revocation safeguards', () => {
   });
   it('never overwrites existing cross-signing or secret storage', async () => {
     const create = vi.fn();
-    const client = { getCrypto: () => ({
-      isSecretStorageReady: async () => true, createRecoveryKeyFromPassphrase: create,
-    }) } as unknown as MatrixClient;
-    await expect(createRecovery(client, new SecretStorageAccess(), 'secret')).rejects.toThrow('существуют');
+    const client = {
+      getCrypto: () => ({
+        isSecretStorageReady: async () => true,
+        createRecoveryKeyFromPassphrase: create,
+      }),
+    } as unknown as MatrixClient;
+    await expect(createRecovery(client, new SecretStorageAccess(), 'secret')).rejects.toThrow(
+      'существуют',
+    );
     expect(create).not.toHaveBeenCalled();
   });
   it('requires password and forbids self-device revocation', async () => {

@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import type { StoredSession } from '@xplink/matrix-adapter';
-import { clearSession, passwordLogin, readSession, storeSession, SecretStorageAccess } from '@xplink/matrix-adapter';
+import {
+  clearSession,
+  passwordLogin,
+  readSession,
+  storeSession,
+  SecretStorageAccess,
+} from '@xplink/matrix-adapter';
 import { LoginForm } from '../features/auth/LoginForm';
 import { AppShell } from '../layouts/AppShell';
 import { useMatrix } from './use-matrix';
@@ -52,5 +58,13 @@ export function App() {
       </main>
     );
   }
-  return <AppShell client={client} revision={revision} userId={session.userId} onLogout={logout} secretAccess={secretAccess} />;
+  return (
+    <AppShell
+      client={client}
+      revision={revision}
+      userId={session.userId}
+      onLogout={logout}
+      secretAccess={secretAccess}
+    />
+  );
 }

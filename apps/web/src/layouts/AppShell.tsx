@@ -57,7 +57,13 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
           />
           <CreateRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
         </div>
-        <button className="security-toggle" onClick={() => setShowSecurity((value) => !value)} aria-expanded={showSecurity}>🔐 Безопасность и устройства</button>
+        <button
+          className="security-toggle"
+          onClick={() => setShowSecurity((value) => !value)}
+          aria-expanded={showSecurity}
+        >
+          🔐 Безопасность и устройства
+        </button>
         <footer className="sidebar-footer">
           <div className="user-avatar">{userId.at(1)?.toUpperCase() ?? '?'}</div>
           <div className="user-info">
@@ -110,8 +116,16 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
           </div>
         )}
       </main>
-      <aside className={showSecurity ? 'security-panel' : 'security-panel security-panel-hidden'} aria-label="Безопасность">
-        <SecurityPanel client={client} secretAccess={secretAccess} roomId={active?.id ?? null} revision={revision} />
+      <aside
+        className={showSecurity ? 'security-panel' : 'security-panel security-panel-hidden'}
+        aria-label="Безопасность"
+      >
+        <SecurityPanel
+          client={client}
+          secretAccess={secretAccess}
+          roomId={active?.id ?? null}
+          revision={revision}
+        />
       </aside>
     </div>
   );

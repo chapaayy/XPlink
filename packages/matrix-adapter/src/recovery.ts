@@ -31,7 +31,7 @@ export async function createRecovery(
   accountPassword: string,
 ): Promise<string> {
   const crypto = cryptoFor(client);
-  if (await crypto.isSecretStorageReady() || await crypto.userHasCrossSigningKeys()) {
+  if ((await crypto.isSecretStorageReady()) || (await crypto.userHasCrossSigningKeys())) {
     throw new Error('Ключи уже существуют. Используйте восстановление, а не сброс.');
   }
   const userId = client.getUserId();
