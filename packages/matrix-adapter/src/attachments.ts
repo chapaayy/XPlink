@@ -23,7 +23,9 @@ export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
  * attachment library implements the v2 AES-CTR/SHA-256 media specification.
  */
 export async function sendEncryptedAttachment(
-  client: MatrixClient, roomId: string, file: File,
+  client: MatrixClient,
+  roomId: string,
+  file: File,
 ): Promise<void> {
   if (file.size <= 0 || file.size > MAX_ATTACHMENT_BYTES)
     throw new Error('Файл должен быть от 1 байта до 10 МБ.');
@@ -39,9 +41,12 @@ export async function sendEncryptedAttachment(
     new Uint8Array(clearBytes).fill(0);
   }
   // The encrypted media's name and original MIME type are never sent to /upload.
-  const uploaded = await client.uploadContent(new Blob([data], {
-    type: 'application/octet-stream',
-  }), { type: 'application/octet-stream', includeFilename: false });
+  const uploaded = await client.uploadContent(
+    new Blob([data], {
+      type: 'application/octet-stream',
+    }),
+    { type: 'application/octet-stream', includeFilename: false },
+  );
   if (!uploaded.content_uri || !info.hashes?.sha256 || !info.key.k || !info.iv)
     throw new Error('Не удалось подготовить защищённое вложение.');
   await client.sendEvent(roomId, EventType.RoomMessage, {
@@ -69,13 +74,18 @@ function authenticatedMediaUrl(client: MatrixClient, uri: string): string {
   const match = /^mxc:\/\/([a-zA-Z0-9.:\-]+)\/([a-zA-Z0-9_\-]+)$/.exec(uri);
   if (!match) throw new Error('Вложение имеет неверный Matrix URI.');
   const [, server, mediaId] = match;
-  return client.getHomeserverUrl().replace(/\/$/, '') +
+  return (
+    client.getHomeserverUrl().replace(/\/$/, '') +
     '/_matrix/client/v1/media/download/' +
-    encodeURIComponent(server) + '/' + encodeURIComponent(mediaId);
+    encodeURIComponent(server) +
+    '/' +
+    encodeURIComponent(mediaId)
+  );
 }
 
 export async function downloadEncryptedAttachment(
-  client: MatrixClient, attachment: ChatAttachment,
+  client: MatrixClient,
+  attachment: ChatAttachment,
 ): Promise<Blob> {
   const token = client.getAccessToken();
   if (!token) throw new Error('Сессия завершена.');

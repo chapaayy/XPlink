@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
-import { sendEncryptedMessage, sendEncryptedAttachment, canWrite, MAX_ATTACHMENT_BYTES } from '@xplink/matrix-adapter';
+import {
+  sendEncryptedMessage,
+  sendEncryptedAttachment,
+  canWrite,
+  MAX_ATTACHMENT_BYTES,
+} from '@xplink/matrix-adapter';
 
 interface Props {
   client: MatrixClient;
@@ -37,7 +42,11 @@ export function Composer({ client, roomId }: Props) {
           {error}
         </p>
       )}
-      {!writable && <p className="trust-warning" role="status">Канал доступен только для чтения: право отправки проверяет сервер.</p>}
+      {!writable && (
+        <p className="trust-warning" role="status">
+          Канал доступен только для чтения: право отправки проверяет сервер.
+        </p>
+      )}
       <div className="composer-bar">
         <input
           aria-label="Сообщение"
@@ -49,18 +58,27 @@ export function Composer({ client, roomId }: Props) {
           Отправить
         </button>
       </div>
-      <label className="attachment-picker">📎 Прикрепить зашифрованный файл (до 10 МБ)
-        <input type="file" aria-label="Зашифрованное вложение" disabled={busy || !writable}
+      <label className="attachment-picker">
+        📎 Прикрепить зашифрованный файл (до 10 МБ)
+        <input
+          type="file"
+          aria-label="Зашифрованное вложение"
+          disabled={busy || !writable}
           onChange={(event) => {
             const file = event.target.files?.[0];
             event.target.value = '';
             if (!file) return;
-            if (file.size > MAX_ATTACHMENT_BYTES) { setError('Размер файла не должен превышать 10 МБ.'); return; }
-            setBusy(true); setError('');
+            if (file.size > MAX_ATTACHMENT_BYTES) {
+              setError('Размер файла не должен превышать 10 МБ.');
+              return;
+            }
+            setBusy(true);
+            setError('');
             void sendEncryptedAttachment(client, roomId, file)
               .catch(() => setError('Не удалось зашифровать или отправить вложение.'))
               .finally(() => setBusy(false));
-          }} />
+          }}
+        />
       </label>
     </form>
   );

@@ -28,8 +28,11 @@ export async function createDirectChat(client: MatrixClient, userId: string): Pr
   if (!client.getCrypto()) throw new Error('Rust Crypto не инициализирован.');
   const self = client.getUserId();
   const peer = userId.trim();
-  if (!/^@[^:\s]+:.+/.test(peer) || peer === self) throw new Error('Введите Matrix ID другого пользователя.');
-  const existing = directRoomMap(client)[peer]?.find((id) => client.getRoom(id)?.getMyMembership() === 'join');
+  if (!/^@[^:\s]+:.+/.test(peer) || peer === self)
+    throw new Error('Введите Matrix ID другого пользователя.');
+  const existing = directRoomMap(client)[peer]?.find(
+    (id) => client.getRoom(id)?.getMyMembership() === 'join',
+  );
   if (existing) {
     await assertEncryptedRoom(client, existing);
     return existing;
@@ -39,10 +42,13 @@ export async function createDirectChat(client: MatrixClient, userId: string): Pr
     preset: Preset.TrustedPrivateChat,
     is_direct: true,
     invite: [peer],
-    initial_state: [{
-      type: 'm.room.encryption', state_key: '',
-      content: { algorithm: 'm.megolm.v1.aes-sha2' },
-    }],
+    initial_state: [
+      {
+        type: 'm.room.encryption',
+        state_key: '',
+        content: { algorithm: 'm.megolm.v1.aes-sha2' },
+      },
+    ],
   });
   await recordDirect(client, peer, room_id);
   return room_id;
@@ -51,7 +57,8 @@ export async function createDirectChat(client: MatrixClient, userId: string): Pr
 export async function markIncomingDirect(client: MatrixClient, roomId: string): Promise<void> {
   const room = client.getRoom(roomId);
   const self = client.getUserId();
-  if (!room || !self || room.getMyMembership() !== 'invite') throw new Error('Приглашение не найдено.');
+  if (!room || !self || room.getMyMembership() !== 'invite')
+    throw new Error('Приглашение не найдено.');
   const invitation = room.currentState.getStateEvents('m.room.member', self);
   const direct = invitation?.getContent()?.is_direct === true;
   if (!direct) return;

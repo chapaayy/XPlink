@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
 import {
-  assertEncryptedRoom, childRoomIds, directRoomIds, listRooms, listSpaces,
+  assertEncryptedRoom,
+  childRoomIds,
+  directRoomIds,
+  listRooms,
+  listSpaces,
 } from '@xplink/matrix-adapter';
 import type { SecretStorageAccess } from '@xplink/matrix-adapter';
 import { RoomList } from '../features/channels/RoomList';
@@ -42,61 +46,131 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
       setSecurityState('Внимание: у комнаты не подтверждено E2EE. Отправка заблокирована.');
     }
   };
-  return <div className="app-layout">
-    <WorkspaceRail client={client} activeSpace={selectedSpace} revision={revision}
-      onSelect={(id) => { setSelectedSpace(id); setSelected(null); }} />
-    <aside className="sidebar">
-      <header className="sidebar-header">
-        <div><h1>XPlink</h1><small>Зашифрованные каналы</small></div>
-        <span className="online-dot" title="Подключено" />
-      </header>
-      <div className="sidebar-scroll">
-        {selectedSpace ? <SpaceNavigation client={client} spaceId={selectedSpace}
-          selectedRoomId={selected} onSelect={(id) => void selectRoom(id)}
-          revision={revision} /> : <>
-          <p className="section-label">Каналы</p>
-          <RoomList client={client} selectedRoomId={selected} onSelect={(id) => void selectRoom(id)}
-            revision={revision} hideRoomIds={[...nested, ...direct]} />
-          <CreateRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
-          <DirectChats client={client} selectedRoomId={selected}
-            onSelect={(id) => void selectRoom(id)} revision={revision} />
-        </>}
-      </div>
-      <button className="security-toggle" onClick={() => setRightPanel((value) =>
-        value === 'security' ? null : 'security')} aria-expanded={rightPanel === 'security'}>
-        🔐 Безопасность и устройства
-      </button>
-      <footer className="sidebar-footer">
-        <div className="user-avatar">{userId.at(1)?.toUpperCase() ?? '?'}</div>
-        <div className="user-info"><strong>{userId.split(':')[0]}</strong><small>Сессия устройства</small></div>
-        <button onClick={() => void onLogout()} title="Выйти">Выйти</button>
-      </footer>
-    </aside>
-    <main className="chat-area">
-      {active ? <>
-        <header className="chat-header">
-          <div><strong># {active.name}</strong><small>🔒 E2EE Matrix / Rust Crypto</small></div>
-          <button className="chat-permissions" disabled={!encrypted}
-            onClick={() => setRightPanel((value) => value === 'roles' ? null : 'roles')}>
-            Участники и права
-          </button>
+  return (
+    <div className="app-layout">
+      <WorkspaceRail
+        client={client}
+        activeSpace={selectedSpace}
+        revision={revision}
+        onSelect={(id) => {
+          setSelectedSpace(id);
+          setSelected(null);
+        }}
+      />
+      <aside className="sidebar">
+        <header className="sidebar-header">
+          <div>
+            <h1>XPlink</h1>
+            <small>Зашифрованные каналы</small>
+          </div>
+          <span className="online-dot" title="Подключено" />
         </header>
-        {securityState && <div className="security-alert" role="alert">{securityState}</div>}
-        {encrypted ? <>
-          <MessageTimeline client={client} roomId={active.id} revision={revision} />
-          <Composer key={active.id} client={client} roomId={active.id} />
-        </> : <div className="center-notice">Комната не зашифрована. Отправка и просмотр заблокированы.</div>}
-      </> : <div className="empty-chat">
-        <div className="empty-icon">🔐</div>
-        <h2>Защищённая переписка начинается здесь</h2>
-        <p>Создайте E2EE-канал, пространство или личный чат. Содержимое сообщений доступно только устройствам с ключами.</p>
-        <p className="muted">Сохраните recovery key. Для публичного запуска требуется аудит безопасности.</p>
-      </div>}
-    </main>
-    {rightPanel === 'security' && <aside className="security-panel" aria-label="Безопасность">
-      <SecurityPanel client={client} secretAccess={secretAccess} roomId={active?.id ?? null} revision={revision} />
-    </aside>}
-    {rightPanel === 'roles' && encrypted && active && <ChannelPermissions client={client}
-      roomId={active.id} revision={revision} />}
-  </div>;
+        <div className="sidebar-scroll">
+          {selectedSpace ? (
+            <SpaceNavigation
+              client={client}
+              spaceId={selectedSpace}
+              selectedRoomId={selected}
+              onSelect={(id) => void selectRoom(id)}
+              revision={revision}
+            />
+          ) : (
+            <>
+              <p className="section-label">Каналы</p>
+              <RoomList
+                client={client}
+                selectedRoomId={selected}
+                onSelect={(id) => void selectRoom(id)}
+                revision={revision}
+                hideRoomIds={[...nested, ...direct]}
+              />
+              <CreateRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
+              <DirectChats
+                client={client}
+                selectedRoomId={selected}
+                onSelect={(id) => void selectRoom(id)}
+                revision={revision}
+              />
+            </>
+          )}
+        </div>
+        <button
+          className="security-toggle"
+          onClick={() => setRightPanel((value) => (value === 'security' ? null : 'security'))}
+          aria-expanded={rightPanel === 'security'}
+        >
+          🔐 Безопасность и устройства
+        </button>
+        <footer className="sidebar-footer">
+          <div className="user-avatar">{userId.at(1)?.toUpperCase() ?? '?'}</div>
+          <div className="user-info">
+            <strong>{userId.split(':')[0]}</strong>
+            <small>Сессия устройства</small>
+          </div>
+          <button onClick={() => void onLogout()} title="Выйти">
+            Выйти
+          </button>
+        </footer>
+      </aside>
+      <main className="chat-area">
+        {active ? (
+          <>
+            <header className="chat-header">
+              <div>
+                <strong># {active.name}</strong>
+                <small>🔒 E2EE Matrix / Rust Crypto</small>
+              </div>
+              <button
+                className="chat-permissions"
+                disabled={!encrypted}
+                onClick={() => setRightPanel((value) => (value === 'roles' ? null : 'roles'))}
+              >
+                Участники и права
+              </button>
+            </header>
+            {securityState && (
+              <div className="security-alert" role="alert">
+                {securityState}
+              </div>
+            )}
+            {encrypted ? (
+              <>
+                <MessageTimeline client={client} roomId={active.id} revision={revision} />
+                <Composer key={active.id} client={client} roomId={active.id} />
+              </>
+            ) : (
+              <div className="center-notice">
+                Комната не зашифрована. Отправка и просмотр заблокированы.
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="empty-chat">
+            <div className="empty-icon">🔐</div>
+            <h2>Защищённая переписка начинается здесь</h2>
+            <p>
+              Создайте E2EE-канал, пространство или личный чат. Содержимое сообщений доступно только
+              устройствам с ключами.
+            </p>
+            <p className="muted">
+              Сохраните recovery key. Для публичного запуска требуется аудит безопасности.
+            </p>
+          </div>
+        )}
+      </main>
+      {rightPanel === 'security' && (
+        <aside className="security-panel" aria-label="Безопасность">
+          <SecurityPanel
+            client={client}
+            secretAccess={secretAccess}
+            roomId={active?.id ?? null}
+            revision={revision}
+          />
+        </aside>
+      )}
+      {rightPanel === 'roles' && encrypted && active && (
+        <ChannelPermissions client={client} roomId={active.id} revision={revision} />
+      )}
+    </div>
+  );
 }

@@ -3,7 +3,10 @@ import { assertEncryptedRoom } from './crypto';
 import { assertStableRoomIdentities } from './identity';
 
 export async function addReaction(
-  client: MatrixClient, roomId: string, eventId: string, emoji: string,
+  client: MatrixClient,
+  roomId: string,
+  eventId: string,
+  emoji: string,
 ): Promise<void> {
   if (!eventId.startsWith('$') || emoji.length === 0 || emoji.length > 12)
     throw new Error('Некорректное сообщение или реакция.');

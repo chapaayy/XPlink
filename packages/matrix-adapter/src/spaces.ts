@@ -14,7 +14,8 @@ export function isSpace(room: Room): boolean {
 }
 
 export function listSpaces(client: MatrixClient): SpaceSummary[] {
-  return client.getRooms()
+  return client
+    .getRooms()
     .filter((room) => isSpace(room) && ['join', 'invite'].includes(room.getMyMembership()))
     .map((room) => ({ id: room.roomId, name: room.name, membership: room.getMyMembership() }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -43,38 +44,58 @@ async function linkChild(client: MatrixClient, parentId: string, childId: string
   }
   // Space linkage is Matrix state and subject to Synapse state-event power levels.
   await client.sendStateEvent(parentId, 'm.space.child', { via: [serverFromId(childId)] }, childId);
-  await client.sendStateEvent(childId, 'm.space.parent', {
-    via: [serverFromId(parentId)], canonical: true,
-  }, parentId);
+  await client.sendStateEvent(
+    childId,
+    'm.space.parent',
+    {
+      via: [serverFromId(parentId)],
+      canonical: true,
+    },
+    parentId,
+  );
 }
 
 export async function createSpace(client: MatrixClient, name: string): Promise<string> {
   if (!client.getCrypto()) throw new Error('Необходимо инициализировать Rust Crypto.');
   if (!name.trim()) throw new Error('Укажите название пространства.');
   const result = await client.createRoom({
-    name: name.trim(), visibility: Visibility.Private, preset: Preset.PrivateChat,
+    name: name.trim(),
+    visibility: Visibility.Private,
+    preset: Preset.PrivateChat,
     creation_content: { type: 'm.space' },
   });
   return result.room_id;
 }
 
-export async function createCategory(client: MatrixClient, parentId: string, name: string): Promise<string> {
+export async function createCategory(
+  client: MatrixClient,
+  parentId: string,
+  name: string,
+): Promise<string> {
   const id = await createSpace(client, name);
   await linkChild(client, parentId, id);
   return id;
 }
 
 export async function createSpaceChannel(
-  client: MatrixClient, parentId: string, name: string, invitee = '',
+  client: MatrixClient,
+  parentId: string,
+  name: string,
+  invitee = '',
 ): Promise<string> {
   const id = await createEncryptedRoom(client, name, invitee);
   await linkChild(client, parentId, id);
   return id;
 }
 
-export async function inviteToSpace(client: MatrixClient, spaceId: string, userId: string): Promise<void> {
+export async function inviteToSpace(
+  client: MatrixClient,
+  spaceId: string,
+  userId: string,
+): Promise<void> {
   const space = client.getRoom(spaceId);
-  if (!space || !isSpace(space) || space.getMyMembership() !== 'join') throw new Error('Нет пространства.');
+  if (!space || !isSpace(space) || space.getMyMembership() !== 'join')
+    throw new Error('Нет пространства.');
   if (!/^@[^:\s]+:.+/.test(userId)) throw new Error('Некорректный Matrix ID.');
   await client.invite(spaceId, userId);
 }

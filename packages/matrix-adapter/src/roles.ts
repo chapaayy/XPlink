@@ -18,7 +18,8 @@ interface Levels {
 export function roomPowerLevels(client: MatrixClient, roomId: string): Levels {
   const room = client.getRoom(roomId);
   if (!room) throw new Error('Комната отсутствует.');
-  return (room.currentState.getStateEvents('m.room.power_levels', '')?.getContent() ?? {}) as Levels;
+  return (room.currentState.getStateEvents('m.room.power_levels', '')?.getContent() ??
+    {}) as Levels;
 }
 
 export function userLevel(client: MatrixClient, roomId: string, userId: string): number {
@@ -31,8 +32,10 @@ export function canWrite(client: MatrixClient, roomId: string): boolean {
   const me = client.getUserId();
   if (!me || client.getRoom(roomId)?.getMyMembership() !== 'join') return false;
   // Synapse checks the *wire event type* m.room.encrypted, not plaintext m.room.message.
-  return userLevel(client, roomId, me) >=
-    (levels.events?.['m.room.encrypted'] ?? levels.events_default ?? 0);
+  return (
+    userLevel(client, roomId, me) >=
+    (levels.events?.['m.room.encrypted'] ?? levels.events_default ?? 0)
+  );
 }
 
 export function isReadOnly(client: MatrixClient, roomId: string): boolean {
@@ -41,17 +44,28 @@ export function isReadOnly(client: MatrixClient, roomId: string): boolean {
 }
 
 export async function assignChannelRole(
-  client: MatrixClient, roomId: string, userId: string, role: ChannelRole,
+  client: MatrixClient,
+  roomId: string,
+  userId: string,
+  role: ChannelRole,
 ): Promise<void> {
-  if (!client.getRoom(roomId)?.hasEncryptionStateEvent()) throw new Error('Роли разрешены только в E2EE-каналах.');
-  if (!client.getRoom(roomId)?.getJoinedMembers().some((member) => member.userId === userId))
+  if (!client.getRoom(roomId)?.hasEncryptionStateEvent())
+    throw new Error('Роли разрешены только в E2EE-каналах.');
+  if (
+    !client
+      .getRoom(roomId)
+      ?.getJoinedMembers()
+      .some((member) => member.userId === userId)
+  )
     throw new Error('Пользователь не состоит в канале.');
   // The homeserver denies upgrades by insufficiently privileged users.
   await client.setPowerLevel(roomId, userId, LEVEL[role]);
 }
 
 export async function setChannelReadOnly(
-  client: MatrixClient, roomId: string, readOnly: boolean,
+  client: MatrixClient,
+  roomId: string,
+  readOnly: boolean,
 ): Promise<void> {
   const room = client.getRoom(roomId);
   if (!room?.hasEncryptionStateEvent() || room.getMyMembership() !== 'join')

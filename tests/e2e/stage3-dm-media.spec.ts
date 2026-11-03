@@ -2,7 +2,8 @@ import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
 test('private DM encrypts text, reactions and media; recipient decrypts attachment', async ({
-  browser, request,
+  browser,
+  request,
 }) => {
   test.setTimeout(120_000);
   const password = process.env.XPLINK_TEST_PASSWORD;
@@ -12,7 +13,10 @@ test('private DM encrypts text, reactions and media; recipient decrypts attachme
   const alice = await a.newPage();
   const bob = await b.newPage();
   try {
-    for (const [page, username] of [[alice,'alicedm'],[bob,'bobdm']] as const) {
+    for (const [page, username] of [
+      [alice, 'alicedm'],
+      [bob, 'bobdm'],
+    ] as const) {
       await page.goto('/');
       await page.getByLabel('Логин Matrix').fill(username);
       await page.getByLabel('Пароль').fill(password);
@@ -31,8 +35,9 @@ test('private DM encrypts text, reactions and media; recipient decrypts attachme
     await expect(bob.getByText(secret)).toBeVisible({ timeout: 40_000 });
     const message = alice.locator('.message').filter({ hasText: secret });
     await message.getByRole('button', { name: 'Реакция 👍' }).click();
-    await expect(bob.locator('.message').filter({ hasText: secret })
-      .locator('.reaction')).toContainText('👍 1', { timeout: 30_000 });
+    await expect(
+      bob.locator('.message').filter({ hasText: secret }).locator('.reaction'),
+    ).toContainText('👍 1', { timeout: 30_000 });
 
     const secretFile = 'NO-PLAINTEXT-MEDIA-' + Date.now();
     const fileName = 'secret-stage3.txt';
@@ -43,7 +48,9 @@ test('private DM encrypts text, reactions and media; recipient decrypts attachme
       if (bytes) mediaUploadEncrypted = !bytes.includes(Buffer.from(secretFile));
     });
     await alice.getByLabel('Зашифрованное вложение').setInputFiles({
-      name: fileName, mimeType: 'text/plain', buffer: Buffer.from(secretFile),
+      name: fileName,
+      mimeType: 'text/plain',
+      buffer: Buffer.from(secretFile),
     });
     await expect(bob.getByText(fileName)).toBeVisible({ timeout: 40_000 });
     expect(mediaUploadEncrypted, 'media upload must not contain plaintext').toBe(true);
@@ -57,7 +64,7 @@ test('private DM encrypts text, reactions and media; recipient decrypts attachme
     // A DM may be listed without an explicit data attr; fall back to the room link.
     const login = await alice.evaluate(() => {
       const raw = sessionStorage.getItem('xplink.matrix.session.v1');
-      return raw ? (JSON.parse(raw) as {accessToken:string}).accessToken : null;
+      return raw ? (JSON.parse(raw) as { accessToken: string }).accessToken : null;
     });
     expect(login).toBeTruthy();
     if (roomId) {
