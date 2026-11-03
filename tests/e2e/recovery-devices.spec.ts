@@ -87,12 +87,13 @@ test('second device restores backed-up E2EE history and revokes the first sessio
     await previous.getByRole('button', { name: 'Отозвать сессию' }).click();
     await expect(previous).toHaveCount(0);
 
-    await expect.poll(async () => {
+    const revokedStatus = async () => {
       const whoami = await request.get('/_matrix/client/v3/account/whoami', {
         headers: { Authorization: 'Bearer ' + auth.accessToken },
       });
       return whoami.status();
-    }, { timeout: 15_000 }).toBe(401);
+    };
+    await expect.poll(revokedStatus, { timeout: 15_000 }).toBe(401);
   } finally {
     await Promise.allSettled([firstCtx.close(), secondCtx.close()]);
   }
