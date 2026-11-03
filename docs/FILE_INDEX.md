@@ -37,3 +37,20 @@
 | `services/caddy/Caddyfile.dev` | Proxy only Matrix client endpoints / Vite | localhost :8080 | Caddy | docs:check / CI | 2026-11-03 |
 | `services/synapse/render_config.py` | Generate secrets once; write localhost homeserver config | CLI render | Python stdlib | docs:check / CI | 2026-11-03 |
 | `tests/e2e/two-browsers.spec.ts` | Independent browsers and ciphertext API assertion | Playwright test | Synapse + browser | E2E | 2026-11-03 |
+| `packages/matrix-adapter/src/secret-storage.ts` | Ephemeral recovery key access to Matrix secret storage | SecretStorageAccess | Matrix recovery-key decoder | recovery.test.ts | 2026-11-04 |
+| `packages/matrix-adapter/src/recovery.ts` | Cross-signing, SSSS, encrypted key backup and restore | createRecovery/recoverDevice/getRecoveryStatus | Rust Crypto API | recovery.test.ts / E2E | 2026-11-04 |
+| `packages/matrix-adapter/src/devices.ts` | Server-backed own device inventory and revocation | listOwnDevices/revokeDevice | MatrixClient /devices + Rust trust | recovery.test.ts / E2E | 2026-11-04 |
+| `packages/matrix-adapter/src/identity.ts` | Trust warnings, fail-closed sending and member removal | roomIdentities/assertStableRoomIdentities/removeRoomMember | Matrix membership + Rust Crypto | identity.test.ts | 2026-11-04 |
+| `packages/matrix-adapter/src/verification.ts` | SAS verification negotiation without auto-confirmation | VerificationFlow + request helpers | Matrix to-device verification | SAS E2E / typecheck | 2026-11-04 |
+| `packages/matrix-adapter/src/recovery.test.ts` | Negative tests for recovery and session revocation | Vitest tests | adapter | CI unit | 2026-11-04 |
+| `packages/matrix-adapter/src/identity.test.ts` | Fail-closed identity and outbound key rotation tests | Vitest tests | adapter | CI unit | 2026-11-04 |
+| `apps/web/src/features/security/RecoveryControls.tsx` | Create, display once, and recover user-owned secret storage key | RecoveryControls | recovery adapter | recovery-devices.spec.ts | 2026-11-04 |
+| `apps/web/src/features/security/DeviceControls.tsx` | Show actual devices and revoke sessions with UIA | DeviceControls | devices adapter | recovery-devices.spec.ts | 2026-11-04 |
+| `apps/web/src/features/security/VerificationControls.tsx` | Interactive SAS display and explicit human confirmation | VerificationControls | verification adapter | CI E2E / typecheck | 2026-11-04 |
+| `apps/web/src/features/security/RoomTrust.tsx` | Room member identity warnings and moderation actions | RoomTrust | identity adapter | identity.test.ts | 2026-11-04 |
+| `apps/web/src/features/security/SecurityPanel.tsx` | Compose security settings by feature responsibility | SecurityPanel | React features | CI build | 2026-11-04 |
+| `tests/e2e/recovery-devices.spec.ts` | Real browser recovery and session revocation acceptance | Playwright E2E | Synapse + browser | CI e2ee | 2026-11-04 |
+| `.github/workflows/stage2-format.yml` | Format stage 2 branch without altering stage 1 or main | GHA on feature push | pnpm + Prettier | CI | 2026-11-04 |
+| `tests/e2e/sas-verification.spec.ts` | Two independent Matrix devices complete human-confirmed SAS verification | Playwright E2E | Synapse + Rust Crypto + browser | CI e2ee | 2026-11-04 |
+| `tests/e2e/member-revocation.spec.ts` | Verify server forbids post-kick ciphertext access to removed members | Playwright E2E | Matrix SDK + Synapse + Chromium | CI e2ee | 2026-11-04 |
+| `tests/e2e/tab-ownership.spec.ts` | Ensure only one browser tab owns the Rust Crypto IndexedDB store | Playwright E2E | Matrix SDK + Synapse + Chromium | CI e2ee | 2026-11-04 |

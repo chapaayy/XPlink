@@ -32,6 +32,12 @@ report_stats: false
 macaroon_secret_key: {macaroon}
 form_secret: {form}
 registration_shared_secret: {registration}
+# Local-only CI has multiple ephemeral logins from one loopback gateway IP.
+# Keep account and failed-attempt rate limits at Synapse defaults; never deploy publicly.
+rc_login:
+  address:
+    per_second: 2
+    burst_count: 30
 enable_registration: false
 enable_registration_without_verification: false
 allow_public_rooms_without_auth: false

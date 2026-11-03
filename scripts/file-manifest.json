@@ -262,5 +262,141 @@
     "dependencies": "Synapse + browser",
     "test": "E2E",
     "review": "2026-11-03"
+  },
+  {
+    "path": "packages/matrix-adapter/src/secret-storage.ts",
+    "purpose": "Ephemeral recovery key access to Matrix secret storage",
+    "contract": "SecretStorageAccess",
+    "dependencies": "Matrix recovery-key decoder",
+    "test": "recovery.test.ts",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/recovery.ts",
+    "purpose": "Cross-signing, SSSS, encrypted key backup and restore",
+    "contract": "createRecovery/recoverDevice/getRecoveryStatus",
+    "dependencies": "Rust Crypto API",
+    "test": "recovery.test.ts / E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/devices.ts",
+    "purpose": "Server-backed own device inventory and revocation",
+    "contract": "listOwnDevices/revokeDevice",
+    "dependencies": "MatrixClient /devices + Rust trust",
+    "test": "recovery.test.ts / E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/identity.ts",
+    "purpose": "Trust warnings, fail-closed sending and member removal",
+    "contract": "roomIdentities/assertStableRoomIdentities/removeRoomMember",
+    "dependencies": "Matrix membership + Rust Crypto",
+    "test": "identity.test.ts",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/verification.ts",
+    "purpose": "SAS verification negotiation without auto-confirmation",
+    "contract": "VerificationFlow + request helpers",
+    "dependencies": "Matrix to-device verification",
+    "test": "SAS E2E / typecheck",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/recovery.test.ts",
+    "purpose": "Negative tests for recovery and session revocation",
+    "contract": "Vitest tests",
+    "dependencies": "adapter",
+    "test": "CI unit",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/identity.test.ts",
+    "purpose": "Fail-closed identity and outbound key rotation tests",
+    "contract": "Vitest tests",
+    "dependencies": "adapter",
+    "test": "CI unit",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/security/RecoveryControls.tsx",
+    "purpose": "Create, display once, and recover user-owned secret storage key",
+    "contract": "RecoveryControls",
+    "dependencies": "recovery adapter",
+    "test": "recovery-devices.spec.ts",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/security/DeviceControls.tsx",
+    "purpose": "Show actual devices and revoke sessions with UIA",
+    "contract": "DeviceControls",
+    "dependencies": "devices adapter",
+    "test": "recovery-devices.spec.ts",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/security/VerificationControls.tsx",
+    "purpose": "Interactive SAS display and explicit human confirmation",
+    "contract": "VerificationControls",
+    "dependencies": "verification adapter",
+    "test": "CI E2E / typecheck",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/security/RoomTrust.tsx",
+    "purpose": "Room member identity warnings and moderation actions",
+    "contract": "RoomTrust",
+    "dependencies": "identity adapter",
+    "test": "identity.test.ts",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/security/SecurityPanel.tsx",
+    "purpose": "Compose security settings by feature responsibility",
+    "contract": "SecurityPanel",
+    "dependencies": "React features",
+    "test": "CI build",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/recovery-devices.spec.ts",
+    "purpose": "Real browser recovery and session revocation acceptance",
+    "contract": "Playwright E2E",
+    "dependencies": "Synapse + browser",
+    "test": "CI e2ee",
+    "review": "2026-11-04"
+  },
+  {
+    "path": ".github/workflows/stage2-format.yml",
+    "purpose": "Format stage 2 branch without altering stage 1 or main",
+    "contract": "GHA on feature push",
+    "dependencies": "pnpm + Prettier",
+    "test": "CI",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/sas-verification.spec.ts",
+    "purpose": "Two independent Matrix devices complete human-confirmed SAS verification",
+    "contract": "Playwright E2E",
+    "dependencies": "Synapse + Rust Crypto + browser",
+    "test": "CI e2ee",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/member-revocation.spec.ts",
+    "purpose": "Verify server forbids post-kick ciphertext access to removed members",
+    "contract": "Playwright E2E",
+    "dependencies": "Matrix SDK + Synapse + Chromium",
+    "test": "CI e2ee",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/tab-ownership.spec.ts",
+    "purpose": "Ensure only one browser tab owns the Rust Crypto IndexedDB store",
+    "contract": "Playwright E2E",
+    "dependencies": "Matrix SDK + Synapse + Chromium",
+    "test": "CI e2ee",
+    "review": "2026-11-04"
   }
 ]

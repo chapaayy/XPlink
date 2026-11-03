@@ -1,15 +1,22 @@
 import { useState } from 'react';
 import type { StoredSession } from '@xplink/matrix-adapter';
-import { clearSession, passwordLogin, readSession, storeSession } from '@xplink/matrix-adapter';
+import {
+  clearSession,
+  passwordLogin,
+  readSession,
+  storeSession,
+  SecretStorageAccess,
+} from '@xplink/matrix-adapter';
 import { LoginForm } from '../features/auth/LoginForm';
 import { AppShell } from '../layouts/AppShell';
 import { useMatrix } from './use-matrix';
 
 export function App() {
+  const [secretAccess] = useState(() => new SecretStorageAccess());
   const [session, setSession] = useState<StoredSession | null>(() => readSession());
   const [busy, setBusy] = useState(false);
   const [authError, setAuthError] = useState('');
-  const { client, status, error, revision } = useMatrix(session);
+  const { client, status, error, revision } = useMatrix(session, secretAccess);
 
   const login = async (user: string, password: string) => {
     setBusy(true);
@@ -30,6 +37,7 @@ export function App() {
     try {
       await client?.logout();
     } finally {
+      secretAccess.clear();
       clearSession();
       setSession(null);
       location.reload();
@@ -50,5 +58,13 @@ export function App() {
       </main>
     );
   }
-  return <AppShell client={client} revision={revision} userId={session.userId} onLogout={logout} />;
+  return (
+    <AppShell
+      client={client}
+      revision={revision}
+      userId={session.userId}
+      onLogout={logout}
+      secretAccess={secretAccess}
+    />
+  );
 }

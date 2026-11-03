@@ -2,7 +2,7 @@
 
 **Цель:** Synapse не должен видеть plaintext **тел сообщений** в E2EE-комнатах. `m.room.encrypted` проверяется через реальный Matrix API в `tests/e2e`. E2EE обеспечивает библиотека matrix-js-sdk + Rust Crypto, а не собственный шифр.
 
-**Чего система не защищает на этом этапе:** от подмены JS владельцем сайта, XSS в браузере, компрометации конечного устройства, копирования сообщений участником, скомпрометированного администратором сервера приглашения и фишинга новой identity, потери ключей после удаления browser storage. Восстановление истории и trust/cross-signing/verification отложены до этапа 2. Между браузерами используется стандартная криптография SDK, но ручная проверка собеседника пока отсутствует; модель аутентичности неполная. **Не используйте stage 1 для секретной переписки.**
+**Чего система не защищает на этом этапе:** от подмены JS владельцем сайта, XSS в браузере, компрометации конечного устройства, копирования сообщений участником, скомпрометированного администратором сервера приглашения и фишинга новой identity, потери ключей после удаления browser storage. Реализация recovery и SAS/cross-signing выполняется в этапе 2; до прохождения CI гарантии не подтверждены. Между браузерами используется стандартная криптография SDK, но ручная проверка собеседника пока отсутствует; модель аутентичности неполная. **Не используйте stage 1 для секретной переписки.**
 
 **Metadata visible to server:** Matrix ID участников, время отправки, членство, имена комнат, IP и объёмы трафика. Комната по умолчанию создаётся приватной; сервер может иметь журнал запросов. Заголовки CSP снижают, но не исключают XSS риск.
 
@@ -13,3 +13,11 @@
 **Dev gateway:** HTTP только на loopback; публичный интернет, TLS, CSP Trusted Types, автоматические бэкапы и независимый аудит пока не обеспечены. Уровень конфиденциальности: **прототип, не утверждённый аудитом**.
 
 **Development-only CSP exception:** `services/caddy/Caddyfile.dev` permits `script-src 'unsafe-inline'` because Vite React Refresh injects an inline preamble. This is acceptable **only on loopback for local development**; a production build must have a separate hardened CSP and static assets. Do not reuse the dev Caddyfile for public hosting.
+
+## Этап 2: добавленные меры
+
+Recovery key генерируется клиентским Rust Crypto, отображается только в браузере и используется через временный callback. Пароль аккаунта передаётся штатному Matrix UIA только при явном действии, не сохраняется на клиенте. Существующая cross-signing identity не сбрасывается автоматически. Полный key backup — клиентски зашифрованный объект; Synapse может хранить шифротекст и метаданные, но не владеет ключом расшифровки.
+
+Смена известной identity блокирует отправку, и интерфейс требует ручной SAS verification. Принудительное исключение проверяется Matrix на сервере, затем сбрасывается исходящий Megolm; прошлые ключи у исключённого пользователя остаются. Отзыв Matrix device не удаляет данные на уже скомпрометированном устройстве. Параллельные вкладки одной origin по-прежнему не используют общий crypto store одновременно.
+
+**Local-only CI login rate limits:** dev `render_config.py` increases only the shared-IP `rc_login.address` burst for isolated Playwright logins through Caddy. Account and failed-attempt limits remain Synapse defaults. The Docker port remains loopback-only; never reuse these limits for a public deployment. Existing homeserver credentials/configuration are not overwritten automatically.

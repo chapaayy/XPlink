@@ -15,3 +15,13 @@
 | Документировать файл                     | `scripts/file-manifest.json`, `scripts/generate-file-index.mjs`                          | Ручной FILE_INDEX                     |
 
 Точный список по файлам с контрактами — `docs/FILE_INDEX.md`; архитектурная граница описана в `docs/ARCHITECTURE.md`.
+
+## Этап 2: точки входа
+
+| Задача                                       | Модуль                                                                                                      | Ограничения                                        |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Recovery key / encrypted secret storage      | `packages/matrix-adapter/src/recovery.ts`, `secret-storage.ts`; UI `features/security/RecoveryControls.tsx` | Не писать и не логировать приватные ключи          |
+| Список и отзыв устройств                     | `packages/matrix-adapter/src/devices.ts`, `features/security/DeviceControls.tsx`                            | Только штатная серверная проверка Matrix UIA       |
+| SAS / предупреждения о новой identity        | `packages/matrix-adapter/src/verification.ts`, `identity.ts`; `VerificationControls.tsx`, `RoomTrust.tsx`   | Без silent verify / acceptance                     |
+| Исключение и ротация Megolm                  | `packages/matrix-adapter/src/identity.ts`                                                                   | Server-enforced kick, old events remain accessible |
+| Сквозное восстановление на втором устройстве | `tests/e2e/recovery-devices.spec.ts`                                                                        | Ни ключи, ни токены не записывать в CI логи        |
