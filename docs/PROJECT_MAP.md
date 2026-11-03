@@ -25,3 +25,15 @@
 | SAS / предупреждения о новой identity        | `packages/matrix-adapter/src/verification.ts`, `identity.ts`; `VerificationControls.tsx`, `RoomTrust.tsx`   | Без silent verify / acceptance                     |
 | Исключение и ротация Megolm                  | `packages/matrix-adapter/src/identity.ts`                                                                   | Server-enforced kick, old events remain accessible |
 | Сквозное восстановление на втором устройстве | `tests/e2e/recovery-devices.spec.ts`                                                                        | Ни ключи, ни токены не записывать в CI логи        |
+
+## Stage 3 — текстовый продукт
+
+| Задача | Владелец | Граница безопасности |
+| --- | --- | --- |
+| Пространства, категории и привязки каналов | `packages/matrix-adapter/src/spaces.ts`, `features/spaces/` | Matrix room state + членство |
+| Личные E2EE чаты и навигация | `packages/matrix-adapter/src/directs.ts`, `features/directs/` | `m.direct` account data, E2EE |
+| Роли и режимы записи | `packages/matrix-adapter/src/roles.ts`, `features/roles/` | `m.room.encrypted` server power levels |
+| Реакции | `reactions.ts`, `timeline.ts`, `MessageTimeline.tsx` | Только E2EE SDK |
+| Зашифрованные файлы | `attachments.ts`, `Composer.tsx`, `MessageTimeline.tsx` | Encrypted upload + SHA-256 |
+| Компоновка UI | `apps/web/src/layouts/AppShell.tsx`, `shared/styles/stage3.css` | Не создавать второй MatrixClient |
+| E2E приёмка | `tests/e2e/stage3-*.spec.ts`, `.github/workflows/verify.yml` | Настоящий Synapse + Chromium |

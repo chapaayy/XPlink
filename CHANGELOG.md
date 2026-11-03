@@ -17,3 +17,11 @@
 - Появились предупреждения о смене идентичности, отказ от отправки при изменённой identity, сброс Megolm outbound session после успешного исключения участника.
 - Подтверждено реальным GitHub Actions CI #41722622079: unit/build/docs/format/lint/typecheck, 5 Playwright E2E (recovery, SAS, kick, tab isolation, encrypted chat), restart persistence.
 - **Ограничение:** ключи нельзя восстановить без сохранённого recovery key; уже прочитанные данные нельзя отозвать; production HTTPS, аудит и более широкий device/session hardening запланированы на отдельные этапы.
+
+## 0.3.0 — Stage 3 text product (under CI acceptance)
+
+- Matrix `m.space` и вложенные категории, каналы, отдельная навигация.
+- Защищённые прямые чаты с `m.direct`, реакции и зашифрованные файлы с проверкой целостности.
+- Реальные per-channel роли и read-only permissions на основе Synapse power levels.
+- Новый интерфейс ролей, медиа, реакций и навигации; E2E и негативные тесты безопасности.
+- До завершения CI и проверки всех сценариев этот этап считается в разработке.

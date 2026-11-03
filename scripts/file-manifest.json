@@ -398,5 +398,125 @@
     "dependencies": "Matrix SDK + Synapse + Chromium",
     "test": "CI e2ee",
     "review": "2026-11-04"
+  },
+  {
+    "path": ".github/workflows/stage3-bootstrap.yml",
+    "purpose": "One-time lockfile, prettier and FILE_INDEX bootstrap on stage-3 branch",
+    "contract": "GitHub Actions",
+    "dependencies": "pnpm 10, Node 22",
+    "test": "CI bootstrap",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/spaces.ts",
+    "purpose": "Native Matrix m.space hierarchy and E2EE channel linking",
+    "contract": "createSpace/createCategory/createSpaceChannel/listSpaces",
+    "dependencies": "Matrix state/membership",
+    "test": "E2E workspace",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/directs.ts",
+    "purpose": "Encrypted one-to-one chats and native m.direct account mapping",
+    "contract": "createDirectChat/markIncomingDirect",
+    "dependencies": "Matrix account_data",
+    "test": "E2E DM",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/roles.ts",
+    "purpose": "Server-authoritative channel roles and readonly permissions",
+    "contract": "assignChannelRole/setChannelReadOnly",
+    "dependencies": "Matrix power levels",
+    "test": "E2E server 403",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/reactions.ts",
+    "purpose": "Encrypted Matrix m.reaction event sending",
+    "contract": "addReaction",
+    "dependencies": "Matrix SDK encrypted timeline",
+    "test": "E2E reactions",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/attachments.ts",
+    "purpose": "Encrypted media upload/download with hash verification and no plaintext fallback",
+    "contract": "sendEncryptedAttachment/downloadEncryptedAttachment",
+    "dependencies": "matrix-encrypt-attachment",
+    "test": "E2E media",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/stage3.test.ts",
+    "purpose": "Negative authorization, media and E2EE tests",
+    "contract": "Vitest tests",
+    "dependencies": "adapter + Vitest",
+    "test": "unit tests",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/spaces/WorkspaceRail.tsx",
+    "purpose": "Workspace switcher and new space action",
+    "contract": "WorkspaceRail",
+    "dependencies": "React + spaces adapter",
+    "test": "E2E space",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/spaces/SpaceNavigation.tsx",
+    "purpose": "Workspace category/channel tree and membership controls",
+    "contract": "SpaceNavigation",
+    "dependencies": "React + spaces adapter",
+    "test": "E2E hierarchy",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/directs/DirectChats.tsx",
+    "purpose": "One-to-one E2EE chat creation and navigation",
+    "contract": "DirectChats",
+    "dependencies": "React + direct adapter",
+    "test": "E2E DM",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/roles/ChannelPermissions.tsx",
+    "purpose": "Power levels and server-enforced role settings UI",
+    "contract": "ChannelPermissions",
+    "dependencies": "React + roles adapter",
+    "test": "E2E 403",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/shared/styles/stage3.css",
+    "purpose": "Workspace, role and attachment layout styles",
+    "contract": "CSS presentation",
+    "dependencies": "global.css + React UI",
+    "test": "visual review",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/stage3-dm-media.spec.ts",
+    "purpose": "Real encrypted DM, reaction, binary media upload and download",
+    "contract": "Playwright E2E",
+    "dependencies": "Synapse + Chromium",
+    "test": "CI E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/stage3-spaces-roles.spec.ts",
+    "purpose": "Workspace category linking and Synapse power-level rejection",
+    "contract": "Playwright E2E",
+    "dependencies": "Synapse + Chromium",
+    "test": "CI E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "docs/adr/0006-matrix-spaces-roles-media.md",
+    "purpose": "Protocol and safety decisions for Matrix text-product model",
+    "contract": "ADR",
+    "dependencies": "Matrix specification",
+    "test": "review",
+    "review": "2026-11-04"
   }
 ]

@@ -21,3 +21,12 @@ Recovery key генерируется клиентским Rust Crypto, отоб
 Смена известной identity блокирует отправку, и интерфейс требует ручной SAS verification. Принудительное исключение проверяется Matrix на сервере, затем сбрасывается исходящий Megolm; прошлые ключи у исключённого пользователя остаются. Отзыв Matrix device не удаляет данные на уже скомпрометированном устройстве. Параллельные вкладки одной origin по-прежнему не используют общий crypto store одновременно.
 
 **Local-only CI login rate limits:** dev `render_config.py` increases only the shared-IP `rc_login.address` burst for isolated Playwright logins through Caddy. Account and failed-attempt limits remain Synapse defaults. The Docker port remains loopback-only; never reuse these limits for a public deployment. Existing homeserver credentials/configuration are not overwritten automatically.
+
+## Этап 3: медиа, роли и метаданные
+
+- Прежде чем загрузить файл, проверяется реальное E2EE-состояние комнаты + идентичности. Размер до 10 МБ, пустые файлы отклоняются. Содержимое файла шифрует на клиенте стандартная `matrix-encrypt-attachment@1.0.3` (Matrix v2 AES-CTR + SHA-256). `/upload` получает ciphertext, MIME `application/octet-stream`, без исходного имени.
+- AES-ключ, IV, SHA-256 и MXC передаются в E2EE `m.room.message`; сервер не должен видеть эти значения без компрометации конечного клиента. Скачивание — только Matrix `mxc://` с авторизованным запросом к доверенному homeserver и проверкой SHA-256 до расшифровки. Сторонние URL отклоняются.
+- Названия пространства, категории, состояние power levels, членство, отправители/время событий и размер зашифрованного медиа остаются видимыми серверу. Защита plaintext не означает сокрытие метаданных.
+- Права ролей проверяются Synapse на событии `m.room.encrypted` (wire type). Для «только модераторы» порог 50. Никаких client-only permission overrides.
+- Протокол Matrix не наследует права и membership через space hierarchy: приглашение в пространство не даёт автоматический доступ ко всем E2EE-каналам. Не заявлять обратного.
+- Секреты файлов остаются в памяти браузера на период выполнения операции; компрометированный JS или устройство может прочитать их. Никакой независимой криптоэкспертизы нет.
