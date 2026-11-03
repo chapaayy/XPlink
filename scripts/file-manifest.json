@@ -382,5 +382,21 @@
     "dependencies": "Synapse + Rust Crypto + browser",
     "test": "CI e2ee",
     "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/member-revocation.spec.ts",
+    "purpose": "Verify server forbids post-kick ciphertext access to removed members",
+    "contract": "Playwright E2E",
+    "dependencies": "Matrix SDK + Synapse + Chromium",
+    "test": "CI e2ee",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/tab-ownership.spec.ts",
+    "purpose": "Ensure only one browser tab owns the Rust Crypto IndexedDB store",
+    "contract": "Playwright E2E",
+    "dependencies": "Matrix SDK + Synapse + Chromium",
+    "test": "CI e2ee",
+    "review": "2026-11-04"
   }
 ]

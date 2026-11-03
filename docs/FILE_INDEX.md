@@ -52,3 +52,5 @@
 | `tests/e2e/recovery-devices.spec.ts` | Real browser recovery and session revocation acceptance | Playwright E2E | Synapse + browser | CI e2ee | 2026-11-04 |
 | `.github/workflows/stage2-format.yml` | Format stage 2 branch without altering stage 1 or main | GHA on feature push | pnpm + Prettier | CI | 2026-11-04 |
 | `tests/e2e/sas-verification.spec.ts` | Two independent Matrix devices complete human-confirmed SAS verification | Playwright E2E | Synapse + Rust Crypto + browser | CI e2ee | 2026-11-04 |
+| `tests/e2e/member-revocation.spec.ts` | Verify server forbids post-kick ciphertext access to removed members | Playwright E2E | Matrix SDK + Synapse + Chromium | CI e2ee | 2026-11-04 |
+| `tests/e2e/tab-ownership.spec.ts` | Ensure only one browser tab owns the Rust Crypto IndexedDB store | Playwright E2E | Matrix SDK + Synapse + Chromium | CI e2ee | 2026-11-04 |
