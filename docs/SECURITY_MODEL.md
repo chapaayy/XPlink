@@ -1,0 +1,15 @@
+# Модель безопасности — с ограничениями
+
+**Цель:** Synapse не должен видеть plaintext **тел сообщений** в E2EE-комнатах. `m.room.encrypted` проверяется через реальный Matrix API в `tests/e2e`. E2EE обеспечивает библиотека matrix-js-sdk + Rust Crypto, а не собственный шифр.
+
+**Чего система не защищает на этом этапе:** от подмены JS владельцем сайта, XSS в браузере, компрометации конечного устройства, копирования сообщений участником, скомпрометированного администратором сервера приглашения и фишинга новой identity, потери ключей после удаления browser storage. Восстановление истории и trust/cross-signing/verification отложены до этапа 2. Между браузерами используется стандартная криптография SDK, но ручная проверка собеседника пока отсутствует; модель аутентичности неполная. **Не используйте stage 1 для секретной переписки.**
+
+**Metadata visible to server:** Matrix ID участников, время отправки, членство, имена комнат, IP и объёмы трафика. Комната по умолчанию создаётся приватной; сервер может иметь журнал запросов. Заголовки CSP снижают, но не исключают XSS риск.
+
+**Fail-closed:** room без `m.room.encryption` не позволяет отправлять; UI отказывает даже в просмотре как чата XPlink. Запросы API могут быть вызваны вручную напрямую; безопасность зависит от Matrix server-side membership & Matrix crypto, не от скрытия кнопок.
+
+**Stage 1 auth/session:** token хранится в `sessionStorage` и живёт до завершения сессии вкладки; JS в скомпрометированном origin может его прочитать. Одновременно две вкладки с crypto store не запускаются (Web Locks, fail-closed). Вход с нового устройства создаёт отдельные ключи, и предыдущая история может быть недоступна.
+
+**Dev gateway:** HTTP только на loopback; публичный интернет, TLS, CSP Trusted Types, автоматические бэкапы и независимый аудит пока не обеспечены. Уровень конфиденциальности: **прототип, не утверждённый аудитом**.
+
+**Development-only CSP exception:** `services/caddy/Caddyfile.dev` permits `script-src 'unsafe-inline'` because Vite React Refresh injects an inline preamble. This is acceptable **only on loopback for local development**; a production build must have a separate hardened CSP and static assets. Do not reuse the dev Caddyfile for public hosting.

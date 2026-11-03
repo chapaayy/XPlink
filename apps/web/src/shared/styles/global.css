@@ -1,0 +1,473 @@
+@import 'tailwindcss';
+:root {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: #e9e9ee;
+  background: #111216;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  border: 0;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #ac8eff;
+  outline-offset: 2px;
+}
+button {
+  color: #fff;
+}
+input {
+  background: #16181d;
+  border: 1px solid #3c3e48;
+  border-radius: 9px;
+  color: #f2f2f8;
+  padding: 11px 12px;
+  width: 100%;
+}
+input::placeholder {
+  color: #777b89;
+}
+p {
+  margin: 0;
+}
+.error {
+  color: #ffaaa7;
+  font-size: 13px;
+}
+.muted {
+  color: #9195a5;
+}
+.brand-logo {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: linear-gradient(140deg, #a37aff, #6e50de);
+  color: white;
+  font-weight: 900;
+  letter-spacing: -2px;
+  font-size: 23px;
+  box-shadow: 0 10px 28px #4529a544;
+}
+.brand-logo.compact {
+  width: 46px;
+  height: 46px;
+  border-radius: 17px;
+  font-size: 20px;
+}
+.app-layout {
+  display: grid;
+  grid-template-columns: 72px 290px 1fr;
+  height: 100dvh;
+  min-height: 480px;
+}
+.workspace-rail {
+  background: #101116;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 10px;
+  border-right: 1px solid #272831;
+}
+.rail-divider {
+  width: 32px;
+  height: 1px;
+  background: #373840;
+}
+.rail-pill {
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  width: 44px;
+  height: 44px;
+  background: #292736;
+  color: #ab9ae3;
+  font-size: 25px;
+}
+.sidebar {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #191a20;
+  border-right: 1px solid #2a2b34;
+}
+.sidebar-header {
+  padding: 25px 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #2c2d35;
+}
+.sidebar-header h1 {
+  font-size: 20px;
+  line-height: 1.2;
+  margin: 0 0 3px;
+  letter-spacing: -0.5px;
+}
+.sidebar-header small,
+.user-info small {
+  color: #85899a;
+}
+.online-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #6ec49a;
+}
+.sidebar-scroll {
+  padding: 20px 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+.section-label {
+  text-transform: uppercase;
+  color: #888d9a;
+  letter-spacing: 1.2px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 0 12px 10px;
+}
+.room-link,
+.invite-button {
+  width: 100%;
+  display: flex;
+  gap: 9px;
+  text-align: left;
+  align-items: center;
+  border-radius: 9px;
+  padding: 11px 12px;
+  background: transparent;
+  color: #abb0bf;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+.room-link:hover,
+.invite-button:hover {
+  background: #252630;
+  color: #fff;
+}
+.room-link.selected {
+  background: #393149;
+  color: #e6d9ff;
+}
+.invite-button {
+  background: #29243d;
+  color: #d8c8ff;
+}
+.room-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 24px;
+  border-top: 1px solid #31323b;
+  padding: 20px 8px;
+}
+.room-form label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ccc5e4;
+}
+.room-form input {
+  font-size: 12px;
+  padding: 10px;
+}
+.room-form button,
+.composer button,
+.auth-card button {
+  background: #8063dc;
+  border-radius: 9px;
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.room-form button:hover,
+.composer button:hover,
+.auth-card button:hover {
+  background: #9676f5;
+}
+.sidebar-footer {
+  padding: 14px 12px;
+  background: #14151a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.user-avatar {
+  background: #6149a3;
+  border-radius: 12px;
+  padding: 10px 13px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.user-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-info strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-footer button {
+  color: #9da1af;
+  font-size: 12px;
+  background: none;
+}
+.chat-area {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #202127;
+}
+.chat-header {
+  min-height: 77px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 25px;
+  border-bottom: 1px solid #35363d;
+  box-shadow: 0 3px 11px #00000017;
+}
+.chat-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.chat-header strong {
+  font-size: 17px;
+}
+.chat-header small {
+  font-size: 12px;
+  color: #9d9fac;
+}
+.header-note {
+  font-size: 12px;
+  color: #9395a1;
+}
+.timeline {
+  padding: 26px 25px;
+  flex: 1;
+  overflow-y: auto;
+}
+.timeline-empty {
+  padding: 20px;
+  text-align: center;
+  color: #999aa8;
+  font-size: 13px;
+}
+.message {
+  padding: 14px 0;
+  border-bottom: 1px solid #2d2e35;
+}
+.message-meta {
+  display: flex;
+  gap: 13px;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.message-meta strong {
+  font-size: 13px;
+  color: #c8b0ff;
+}
+.message-meta time {
+  color: #818694;
+  font-size: 11px;
+}
+.message p {
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.composer {
+  padding: 16px 24px 23px;
+  display: grid;
+  gap: 7px;
+}
+.composer-bar {
+  display: flex;
+  background: #2b2c34;
+  padding: 7px;
+  border-radius: 12px;
+  gap: 8px;
+}
+.composer-bar input {
+  background: none;
+  border: 0;
+}
+.composer-bar button {
+  padding-inline: 18px;
+}
+.security-alert {
+  color: #ffe6a7;
+  background: #4b3c23;
+  padding: 12px 24px;
+  font-size: 13px;
+}
+.empty-chat {
+  margin: auto;
+  max-width: 540px;
+  display: grid;
+  gap: 18px;
+  text-align: center;
+  padding: 35px;
+}
+.empty-chat h2 {
+  margin: 0;
+  font-size: 24px;
+}
+.empty-chat p {
+  line-height: 1.7;
+  font-size: 14px;
+  color: #b0b1be;
+}
+.empty-icon {
+  font-size: 48px;
+}
+.auth-page,
+.connection-screen {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  padding: 25px;
+  background: radial-gradient(ellipse at 60% 5%, #2a213d, #101116 65%);
+}
+.auth-card {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  padding: 36px;
+  background: #202127;
+  border: 1px solid #343540;
+  border-radius: 19px;
+  box-shadow: 0 24px 60px #0006;
+}
+.auth-card h1 {
+  font-size: 29px;
+  letter-spacing: -0.8px;
+  margin: 0;
+}
+.auth-card > p {
+  color: #989ba9;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.auth-card label {
+  font-weight: 700;
+  font-size: 13px;
+}
+.auth-card small {
+  color: #8d90a1;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.connection-screen {
+  gap: 16px;
+  text-align: center;
+}
+.connection-screen h1 {
+  margin: 0;
+}
+.connection-screen button {
+  background: #6d55b7;
+  padding: 12px 22px;
+  border-radius: 9px;
+}
+.connection-screen p {
+  max-width: 400px;
+}
+.center-notice {
+  margin: auto;
+  padding: 22px;
+  color: #ffc3b8;
+}
+@media (max-width: 800px) {
+  .app-layout {
+    grid-template-columns: 54px 205px minmax(0, 1fr);
+  }
+  .workspace-rail {
+    padding: 13px 5px;
+  }
+  .sidebar-header {
+    padding: 20px 12px;
+  }
+  .chat-header {
+    padding: 12px;
+  }
+  .header-note {
+    display: none;
+  }
+  .timeline {
+    padding: 12px;
+  }
+  .composer {
+    padding: 10px;
+  }
+}
+@media (max-width: 540px) {
+  .app-layout {
+    grid-template-columns: 48px 130px minmax(0, 1fr);
+  }
+  .room-link {
+    font-size: 11px;
+    padding: 10px 4px;
+  }
+  .room-form {
+    padding: 15px 0;
+  }
+  .room-form button {
+    font-size: 11px;
+  }
+  .sidebar-header h1 {
+    font-size: 16px;
+  }
+  .user-info {
+    display: none;
+  }
+  .sidebar-footer {
+    flex-wrap: wrap;
+  }
+  .brand-logo.compact {
+    width: 39px;
+    height: 39px;
+  }
+  .chat-header strong {
+    font-size: 13px;
+  }
+  .composer-bar {
+    flex-wrap: wrap;
+  }
+  .composer-bar button {
+    width: 100%;
+  }
+}

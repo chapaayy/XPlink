@@ -1,0 +1,10 @@
+export { passwordLogin, readSession, storeSession, clearSession } from './session';
+export type { StoredSession } from './session';
+export { acquireCryptoTab } from './tab-lock';
+export { initializeMatrix } from './client';
+export { assertEncryptedRoom } from './crypto';
+export { listRooms, createEncryptedRoom, acceptRoomInvite } from './rooms';
+export type { RoomSummary } from './rooms';
+export { sendEncryptedMessage } from './messages';
+export { roomMessages } from './timeline';
+export type { ChatMessage } from './timeline';
