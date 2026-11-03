@@ -53,7 +53,7 @@ export function App() {
         <p>{status === 'blocked' || status === 'error' ? error : 'Подключение и запуск E2EE…'}</p>
         <button onClick={() => location.reload()}>Повторить</button>
         <p className="muted">
-          В этапе 1 recovery key и подтверждение новых устройств ещё не реализованы.
+          Не используйте XPlink для критических данных до независимого аудита безопасности.
         </p>
       </main>
     );
