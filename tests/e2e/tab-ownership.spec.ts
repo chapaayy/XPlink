@@ -12,9 +12,7 @@ test('a second tab cannot open the same Rust Crypto store concurrently', async (
     await first.getByRole('button', { name: 'Войти' }).click();
     await expect(first.getByText('Зашифрованные каналы')).toBeVisible();
 
-    const stored = await first.evaluate(() =>
-      sessionStorage.getItem('xplink.matrix.session.v1'),
-    );
+    const stored = await first.evaluate(() => sessionStorage.getItem('xplink.matrix.session.v1'));
     expect(stored).toBeTruthy();
     const other = await context.newPage();
     await other.goto('/');

@@ -27,7 +27,9 @@ test('kicked user cannot fetch a new encrypted event', async ({ browser, request
     await bob.getByRole('button', { name: /Принять приглашение/ }).click();
     await expect(bob.getByRole('textbox', { name: 'Сообщение' })).toBeVisible();
 
-    const roomId = await alice.locator('[data-testid="room-link"]').first()
+    const roomId = await alice
+      .locator('[data-testid="room-link"]')
+      .first()
       .getAttribute('data-room-id');
     if (!roomId) throw new Error('Room not created');
     const oldToken = await bob.evaluate(() => {
@@ -68,8 +70,7 @@ test('kicked user cannot fetch a new encrypted event', async ({ browser, request
     if (!encrypted) return;
 
     const forbidden = await request.get(
-      '/_matrix/client/v3/rooms/' + roomPath + '/event/' +
-        encodeURIComponent(encrypted.event_id),
+      '/_matrix/client/v3/rooms/' + roomPath + '/event/' + encodeURIComponent(encrypted.event_id),
       { headers: { Authorization: 'Bearer ' + oldToken } },
     );
     expect(forbidden.status()).toBe(403);
