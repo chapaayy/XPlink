@@ -12,11 +12,40 @@ export class VerificationFlow {
   private verifier: Verifier | null = null;
   private callbacks: ShowSasCallbacks | null = null;
 
+  private readonly onRequestChanged = () => {
+    this.attachExistingVerifier();
+    this.changed();
+  };
+
   constructor(
     readonly request: VerificationRequest,
     private readonly changed: () => void,
   ) {
-    request.on(VerificationRequestEvent.Change, changed);
+    request.on(VerificationRequestEvent.Change, this.onRequestChanged);
+    this.attachExistingVerifier();
+  }
+
+  /** Both the initiator and the recipient must run their own Verifier.verify(). */
+  private attachExistingVerifier(): void {
+    const verifier = this.request.verifier;
+    if (verifier) this.attachVerifier(verifier);
+  }
+
+  private attachVerifier(verifier: Verifier): void {
+    if (this.verifier === verifier) return;
+    this.verifier = verifier;
+    verifier.on(VerifierEvent.ShowSas, (callbacks) => {
+      this.callbacks = callbacks;
+      this.changed();
+    });
+    verifier.on(VerifierEvent.Cancel, () => this.changed());
+    const existing = verifier.getShowSasCallbacks();
+    if (existing) {
+      this.callbacks = existing;
+      this.changed();
+    }
+    // The promise resolves only after explicit SAS comparison on both devices.
+    void verifier.verify().catch(() => this.changed());
   }
 
   get state(): number {
@@ -26,7 +55,7 @@ export class VerificationFlow {
   get sas(): SasDisplay | null {
     if (!this.callbacks) return null;
     return {
-      emoji: this.callbacks.sas.emoji?.map((entry) => entry[0]) ?? [],
+      emoji: this.callbacks.sas.emoji?.map((entry) => entry.join(' ')) ?? [],
       decimal: [...(this.callbacks.sas.decimal ?? [])],
     };
   }
@@ -37,14 +66,8 @@ export class VerificationFlow {
   }
 
   async startSas(): Promise<void> {
-    this.verifier = await this.request.startVerification('m.sas.v1');
-    this.verifier.on(VerifierEvent.ShowSas, (callbacks) => {
-      this.callbacks = callbacks;
-      this.changed();
-    });
-    this.verifier.on(VerifierEvent.Cancel, () => this.changed());
-    // Verification remains pending until both people compare and confirm SAS.
-    void this.verifier.verify().catch(() => this.changed());
+    const verifier = await this.request.startVerification('m.sas.v1');
+    this.attachVerifier(verifier);
     this.changed();
   }
 
@@ -66,7 +89,7 @@ export class VerificationFlow {
   }
 
   dispose(): void {
-    this.request.off(VerificationRequestEvent.Change, this.changed);
+    this.request.off(VerificationRequestEvent.Change, this.onRequestChanged);
   }
 }
 
