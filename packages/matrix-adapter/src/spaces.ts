@@ -40,19 +40,26 @@ function serverFromId(id: string): string {
 async function linkChild(client: MatrixClient, parentId: string, childId: string): Promise<void> {
   const parent = client.getRoom(parentId);
   if (!parent || !isSpace(parent) || parent.getMyMembership() !== 'join') {
-    throw new Error('Родительское пространство не доступно.');
+    throw new Error('SPACE_PARENT_NOT_JOINED');
   }
   // Space linkage is Matrix state and subject to Synapse state-event power levels.
-  await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [serverFromId(childId)] }, childId);
-  await client.sendStateEvent(
-    childId,
-    EventType.SpaceParent,
-    {
-      via: [serverFromId(parentId)],
-      canonical: true,
-    },
-    parentId,
-  );
+  try {
+    await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [serverFromId(childId)] }, childId);
+  } catch (error) {
+    const kind = error instanceof Error ? error.name : 'unknown';
+    throw new Error('SPACE_CHILD_EVENT_' + kind);
+  }
+  try {
+    await client.sendStateEvent(
+      childId,
+      EventType.SpaceParent,
+      { via: [serverFromId(parentId)], canonical: true },
+      parentId,
+    );
+  } catch (error) {
+    const kind = error instanceof Error ? error.name : 'unknown';
+    throw new Error('SPACE_PARENT_EVENT_' + kind);
+  }
 }
 
 export async function createSpace(client: MatrixClient, name: string): Promise<string> {

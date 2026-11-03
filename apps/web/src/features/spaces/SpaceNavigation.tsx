@@ -77,7 +77,9 @@ export function SpaceNavigation({ client, spaceId, selectedRoomId, onSelect, rev
             .catch((error: unknown) => {
               const code = (error as { errcode?: unknown })?.errcode;
               const safeCode = typeof code === 'string' && /^M_[A-Z_]+$/.test(code) ? code : 'UNKNOWN';
-              setError('Создание не удалось. Matrix: ' + safeCode + '.');
+              const stage = error instanceof Error && /^SPACE_[A-Z_]+(?:TypeError|Error|MatrixError)?$/.test(error.message)
+                ? error.message : '';
+              setError('Создание не удалось. Matrix: ' + safeCode + (stage ? ' (' + stage + ')' : '') + '.');
             })
             .finally(() => setBusy(false));
         }}
