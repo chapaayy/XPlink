@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: stage3-bootstrap
+  cancel-in-progress: false
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
