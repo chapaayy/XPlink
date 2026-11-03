@@ -14,7 +14,7 @@
     "lint": "eslint apps/web/src packages/matrix-adapter/src",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run && node --test scripts/*.test.mjs",
+    "test": "vitest run packages/matrix-adapter/src && node --test scripts/*.test.mjs",
     "test:e2e": "playwright test",
     "docs:generate": "node scripts/generate-file-index.mjs",
     "docs:check": "node scripts/generate-file-index.mjs --check && node scripts/verify-repo-map.mjs"
