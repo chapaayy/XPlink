@@ -6,7 +6,7 @@ import { sendEncryptedMessage } from './messages';
 function fakeClient(encrypted: boolean, initialized: boolean) {
   const sendEvent = vi.fn();
   const client = {
-    getRoom: () => ({ getMyMembership: () => 'join', hasEncryptionStateEvent: () => encrypted }),
+    getRoom: () => ({ getMyMembership: () => 'join', hasEncryptionStateEvent: () => encrypted, getJoinedMembers: () => [] }),
     getCrypto: () => (initialized ? { isEncryptionEnabledInRoom: async () => encrypted } : null),
     sendEvent,
   } as unknown as MatrixClient;
