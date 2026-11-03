@@ -22,16 +22,16 @@ test('space categories link E2EE channels and Synapse enforces readonly/role per
     await alice.getByRole('button', { name: 'Создать пространство' }).click();
     await alice.getByLabel('Название пространства').fill('Studio');
     await alice.getByRole('button', { name: 'Создать', exact: true }).click();
-    await expect(alice.getByLabel('Пространство · Studio')).toBeVisible({ timeout: 30_000 });
+    await expect(alice.getByText('Пространство · Studio')).toBeVisible({ timeout: 30_000 });
 
     await alice.getByLabel('Тип элемента').selectOption('category');
-    await alice.getByLabel('space-new-name').fill('Design');
+    await alice.locator('#space-new-name').fill('Design');
     await alice.getByRole('button', { name: 'Создать', exact: true }).click();
     await expect(alice.getByText('⌄ Design')).toBeVisible({ timeout: 20_000 });
 
     await alice.getByLabel('Тип элемента').selectOption('channel');
     await alice.getByLabel('Категория канала').selectOption({ label: 'Design' });
-    await alice.getByLabel('space-new-name').fill('concepts');
+    await alice.locator('#space-new-name').fill('concepts');
     await alice.getByLabel('Пригласить в канал').fill('@bobwork:localhost');
     await alice.getByRole('button', { name: 'Создать', exact: true }).click();
     await expect(bob.getByRole('button', { name: /Принять приглашение/ })).toBeVisible({ timeout: 30_000 });

@@ -20,7 +20,7 @@ export function DirectChats({ client, selectedRoomId, onSelect, revision }: Prop
     {Object.entries(direct).flatMap(([userId, ids]) => ids
       .filter((id) => client.getRoom(id)?.getMyMembership() === 'join')
       .map((id) => <button key={id} className={id === selectedRoomId ? 'room-link selected' : 'room-link'}
-        data-testid="dm-link" onClick={() => onSelect(id)}>
+        data-testid="dm-link" data-room-id={id} onClick={() => onSelect(id)}>
         <span>✉</span>{userId}
       </button>))}
     <form className="compact-form" onSubmit={(event) => {

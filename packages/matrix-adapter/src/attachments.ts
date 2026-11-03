@@ -31,7 +31,13 @@ export async function sendEncryptedAttachment(
   await assertStableRoomIdentities(client, roomId);
   const name = file.name.replace(/[\\/\x00-\x1f]/g, '_').slice(0, 120) || 'file';
   const clearBytes = await file.arrayBuffer();
-  const { data, info } = await encryptAttachment(clearBytes);
+  let data: ArrayBuffer;
+  let info: Awaited<ReturnType<typeof encryptAttachment>>['info'];
+  try {
+    ({ data, info } = await encryptAttachment(clearBytes));
+  } finally {
+    new Uint8Array(clearBytes).fill(0);
+  }
   // The encrypted media's name and original MIME type are never sent to /upload.
   const uploaded = await client.uploadContent(new Blob([data], {
     type: 'application/octet-stream',
