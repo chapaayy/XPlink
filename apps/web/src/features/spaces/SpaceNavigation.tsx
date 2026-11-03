@@ -74,7 +74,11 @@ export function SpaceNavigation({ client, spaceId, selectedRoomId, onSelect, rev
               setInvite('');
               if (kind === 'channel') onSelect(id);
             })
-            .catch(() => setError('Создание не удалось. Проверьте права и Matrix ID.'))
+            .catch((error: unknown) => {
+              const code = (error as { errcode?: unknown })?.errcode;
+              const safeCode = typeof code === 'string' && /^M_[A-Z_]+$/.test(code) ? code : 'UNKNOWN';
+              setError('Создание не удалось. Matrix: ' + safeCode + '.');
+            })
             .finally(() => setBusy(false));
         }}
       >
