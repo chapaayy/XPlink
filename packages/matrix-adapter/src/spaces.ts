@@ -46,7 +46,7 @@ async function linkChild(client: MatrixClient, parentId: string, childId: string
   await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [serverFromId(childId)] }, childId);
   await client.sendStateEvent(
     childId,
-    'm.space.parent',
+    EventType.SpaceParent,
     {
       via: [serverFromId(parentId)],
       canonical: true,

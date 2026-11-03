@@ -1,5 +1,5 @@
 import type { MatrixClient } from 'matrix-js-sdk';
-import { EventType } from 'matrix-js-sdk';
+import { EventType, RelationType } from 'matrix-js-sdk';
 import { assertEncryptedRoom } from './crypto';
 import { assertStableRoomIdentities } from './identity';
 
@@ -15,6 +15,6 @@ export async function addReaction(
   await assertStableRoomIdentities(client, roomId);
   // SDK must encrypt this m.reaction event as m.room.encrypted on the wire.
   await client.sendEvent(roomId, EventType.Reaction, {
-    'm.relates_to': { rel_type: 'm.annotation', event_id: eventId, key: emoji },
+    'm.relates_to': { rel_type: RelationType.Annotation, event_id: eventId, key: emoji },
   });
 }
