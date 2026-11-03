@@ -1,5 +1,5 @@
 import type { MatrixClient } from 'matrix-js-sdk';
-import { EventType } from 'matrix-js-sdk';
+import { EventType, MsgType } from 'matrix-js-sdk';
 import { assertEncryptedRoom } from './crypto';
 
 export async function sendEncryptedMessage(
@@ -10,5 +10,5 @@ export async function sendEncryptedMessage(
   if (!text.trim()) return;
   await assertEncryptedRoom(client, roomId);
   // SDK encrypts m.room.message before upload in encrypted rooms.
-  await client.sendEvent(roomId, EventType.RoomMessage, { msgtype: 'm.text', body: text.trim() });
+  await client.sendEvent(roomId, EventType.RoomMessage, { msgtype: MsgType.Text, body: text.trim() });
 }
