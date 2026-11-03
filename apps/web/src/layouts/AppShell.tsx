@@ -109,10 +109,8 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
               Создайте зашифрованный канал и пригласите второго участника по Matrix ID. У второго
               пользователя появится приглашение.
             </p>
-            <p className="muted">
-              Сохраните recovery key в настройках безопасности и проверяйте новые устройства.
-              До публичного запуска XPlink необходим независимый аудит безопасности.
-            </p>
+            <p className="muted">Сохраните recovery key и проверяйте новые устройства.</p>
+            <p className="muted">До публичного запуска требуется аудит безопасности.</p>
           </div>
         )}
       </main>
