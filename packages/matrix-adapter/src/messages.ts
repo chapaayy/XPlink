@@ -10,5 +10,8 @@ export async function sendEncryptedMessage(
   if (!text.trim()) return;
   await assertEncryptedRoom(client, roomId);
   // SDK encrypts m.room.message before upload in encrypted rooms.
-  await client.sendEvent(roomId, EventType.RoomMessage, { msgtype: MsgType.Text, body: text.trim() });
+  await client.sendEvent(roomId, EventType.RoomMessage, {
+    msgtype: MsgType.Text,
+    body: text.trim(),
+  });
 }
