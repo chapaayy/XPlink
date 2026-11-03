@@ -19,3 +19,5 @@ E2E: `tests/e2e/recovery-devices.spec.ts` использует два незав
 Дополнительная ручная приёмка: сравнить SAS на двух настоящих устройствах, намеренно выбрать «не совпадает», проверить отмену; проверить смену identity, удаление участника и невозможность чтения новых событий после kick; второй экземпляр той же вкладки должен быть безопасно заблокирован. Полноценная криптоэкспертиза остаётся этапом 6.
 
 **Изоляция E2E:** каждый сценарий использует отдельную пару/аккаунт Synapse, чтобы rate limits для логина и изменения cross-signing / device identities одного теста не влияли на другие. Аккаунты создаются временно в job GitHub Actions при закрытой регистрации; ключи не печатаются.
+
+**CI ratelimit policy:** Synapse normally limits `rc_login.address` to a burst of 5 requests per IP; several independent browser cases run behind the same local Caddy address. Dev-only generated config raises the IP burst to 30 while retaining normal per-account and failed-attempt limits. Production must have a separate, strict policy.
