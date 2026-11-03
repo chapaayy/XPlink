@@ -11,13 +11,30 @@ test('two independent browsers exchange E2EE ciphertext; Synapse does not see te
   const alice = await a.newPage();
   const bob = await b.newPage();
   let stage = 'opening login pages';
+  const bootstrapErrors: string[] = [];
   try {
     for (const [page, name] of [
       [alice, 'alice'],
       [bob, 'bob'],
     ] as const) {
       stage = `login ${name}`;
-      await page.goto('/');
+      // A 200 from Caddy is not enough: Vite may serve HTML while CSP blocks React.
+      page.on('pageerror', (error) => {
+        if (stage.startsWith('login')) bootstrapErrors.push(error.message.slice(0, 300));
+      });
+      const navigation = await page.goto('/');
+      expect(navigation?.status(), 'gateway must serve a successful HTML document').toBe(200);
+      try {
+        await expect(page.getByLabel('Логин Matrix')).toBeVisible({ timeout: 15_000 });
+      } catch (error) {
+        // No page bodies or network payloads: login/session credentials must stay private.
+        console.error('Bootstrap diagnostics:', {
+          status: navigation?.status(),
+          rootChildren: await page.locator('#root > *').count(),
+          errors: bootstrapErrors,
+        });
+        throw error;
+      }
       await page.getByLabel('Логин Matrix').fill(name);
       await page.getByLabel('Пароль').fill(password);
       await page.getByRole('button', { name: 'Войти' }).click();

@@ -11,3 +11,5 @@
 **Stage 1 auth/session:** token хранится в `sessionStorage` и живёт до завершения сессии вкладки; JS в скомпрометированном origin может его прочитать. Одновременно две вкладки с crypto store не запускаются (Web Locks, fail-closed). Вход с нового устройства создаёт отдельные ключи, и предыдущая история может быть недоступна.
 
 **Dev gateway:** HTTP только на loopback; публичный интернет, TLS, CSP Trusted Types, автоматические бэкапы и независимый аудит пока не обеспечены. Уровень конфиденциальности: **прототип, не утверждённый аудитом**.
+
+**Development-only CSP exception:** `services/caddy/Caddyfile.dev` permits `script-src 'unsafe-inline'` because Vite React Refresh injects an inline preamble. This is acceptable **only on loopback for local development**; a production build must have a separate hardened CSP and static assets. Do not reuse the dev Caddyfile for public hosting.
