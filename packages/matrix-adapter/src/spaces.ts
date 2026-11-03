@@ -43,22 +43,15 @@ async function linkChild(client: MatrixClient, parentId: string, childId: string
   if (!parent || !isSpace(parent) || parent.getMyMembership() !== 'join') {
     throw new Error('SPACE_PARENT_NOT_JOINED');
   }
-  // Space linkage is Matrix state and subject to Synapse state-event power levels.
-  try {
-    await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [localVia(client)] }, childId);
-  } catch (error) {
-    throw new Error('SPACE_CHILD_EVENT_' + classifyStateFailure(error));
-  }
-  try {
-    await client.sendStateEvent(
-      childId,
-      EventType.SpaceParent,
-      { via: [localVia(client)], canonical: true },
-      parentId,
-    );
-  } catch (error) {
-    throw new Error('SPACE_PARENT_EVENT_' + classifyStateFailure(error));
-  }
+  // Space linkage remains regular Matrix state, validated by server power levels.
+  // Matrix v12 room IDs are opaque: via identifies the user's local homeserver.
+  await client.sendStateEvent(parentId, EventType.SpaceChild, { via: [localVia(client)] }, childId);
+  await client.sendStateEvent(
+    childId,
+    EventType.SpaceParent,
+    { via: [localVia(client)], canonical: true },
+    parentId,
+  );
 }
 
 export async function createSpace(client: MatrixClient, name: string): Promise<string> {
