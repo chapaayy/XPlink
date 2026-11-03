@@ -10,7 +10,9 @@ describe('recovery keys and revocation safeguards', () => {
     const source = new Uint8Array([1, 2, 3]);
     access.setRawKey(source);
     source.fill(0);
-    const opts = { keys: { key1: {} } } as unknown as Parameters<NonNullable<typeof access.callbacks.getSecretStorageKey>>[0];
+    const opts = { keys: { key1: {} } } as unknown as Parameters<
+      NonNullable<typeof access.callbacks.getSecretStorageKey>
+    >[0];
     const before = await access.callbacks.getSecretStorageKey?.(opts, 'test');
     expect(Array.from(before?.[1] ?? [])).toEqual([1, 2, 3]);
     access.clear();
