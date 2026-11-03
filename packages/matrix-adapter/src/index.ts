@@ -33,6 +33,7 @@ export { createDirectChat, directRoomMap, directRoomIds, markIncomingDirect } fr
 export {
   roomPowerLevels,
   userLevel,
+  isRoomCreator,
   canWrite,
   isReadOnly,
   assignChannelRole,

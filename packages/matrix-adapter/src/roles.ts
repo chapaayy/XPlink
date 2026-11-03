@@ -27,6 +27,10 @@ export function isRoomCreator(client: MatrixClient, roomId: string, userId: stri
   const event = client.getRoom(roomId)?.currentState.getStateEvents('m.room.create', '');
   if (!event) return false;
   const content = event.getContent();
+  const roomVersion = content.room_version;
+  const version = typeof roomVersion === 'string' && /^\\d+$/.test(roomVersion)
+    ? Number(roomVersion) : 1;
+  if (version < 12) return false;
   return event.getSender() === userId ||
     (Array.isArray(content.additional_creators) && content.additional_creators.includes(userId));
 }
