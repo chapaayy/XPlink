@@ -29,6 +29,11 @@ fi
 if [ -f .local/synapse/homeserver.yaml ] && [ -f .local/synapse/.xplink-configured ]; then
   echo 'Keeping existing Synapse configuration and secrets unchanged.'
 else
-  python3 services/synapse/render_config.py
+  # Synapse owns /data as uid 991. Render in that identity, not as the host user.
+  docker compose --env-file .env -f deploy/compose.dev.yml run --rm --no-deps \
+    --user 991:991 --entrypoint python \
+    -v "$PWD:/workspace" \
+    -e POSTGRES_PASSWORD -e MATRIX_SERVER_NAME \
+    synapse /workspace/services/synapse/render_config.py
 fi
 echo 'Ready: docker compose --env-file .env -f deploy/compose.dev.yml up --build -d'
