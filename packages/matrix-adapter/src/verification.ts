@@ -1,4 +1,5 @@
 import type { MatrixClient } from 'matrix-js-sdk';
+import { VerificationRequestEvent, VerifierEvent } from 'matrix-js-sdk/lib/crypto-api';
 import type { ShowSasCallbacks, VerificationRequest, Verifier } from 'matrix-js-sdk/lib/crypto-api';
 
 export interface SasDisplay {
@@ -15,7 +16,7 @@ export class VerificationFlow {
     readonly request: VerificationRequest,
     private readonly changed: () => void,
   ) {
-    request.on('change', changed);
+    request.on(VerificationRequestEvent.Change, changed);
   }
 
   get state(): number {
@@ -37,11 +38,11 @@ export class VerificationFlow {
 
   async startSas(): Promise<void> {
     this.verifier = await this.request.startVerification('m.sas.v1');
-    this.verifier.on('show_sas', (callbacks) => {
+    this.verifier.on(VerifierEvent.ShowSas, (callbacks) => {
       this.callbacks = callbacks;
       this.changed();
     });
-    this.verifier.on('cancel', () => this.changed());
+    this.verifier.on(VerifierEvent.Cancel, () => this.changed());
     // Verification remains pending until both people compare and confirm SAS.
     void this.verifier.verify().catch(() => this.changed());
     this.changed();
@@ -65,7 +66,7 @@ export class VerificationFlow {
   }
 
   dispose(): void {
-    this.request.off('change', this.changed);
+    this.request.off(VerificationRequestEvent.Change, this.changed);
   }
 }
 
