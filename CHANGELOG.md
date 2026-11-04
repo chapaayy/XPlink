@@ -18,10 +18,11 @@
 - Подтверждено реальным GitHub Actions CI #41722622079: unit/build/docs/format/lint/typecheck, 5 Playwright E2E (recovery, SAS, kick, tab isolation, encrypted chat), restart persistence.
 - **Ограничение:** ключи нельзя восстановить без сохранённого recovery key; уже прочитанные данные нельзя отозвать; production HTTPS, аудит и более широкий device/session hardening запланированы на отдельные этапы.
 
-## 0.3.0 — Stage 3 text product (under CI acceptance)
+## 0.3.0 — Stage 3 text product (accepted local prototype)
 
 - Matrix `m.space` и вложенные категории, каналы, отдельная навигация.
 - Защищённые прямые чаты с `m.direct`, реакции и зашифрованные файлы с проверкой целостности.
 - Реальные per-channel роли и read-only permissions на основе Synapse power levels.
 - Новый интерфейс ролей, медиа, реакций и навигации; E2E и негативные тесты безопасности.
-- До завершения CI и проверки всех сценариев этот этап считается в разработке.
+- Приёмка GitHub Actions #41846507062: quality и 7/7 Playwright E2E, в том числе прямой серверный запрет на отправку зашифрованного события без полномочий; рестарт сохранил 8 комнат.
+- Ограничения: роли действуют отдельно в каждой комнате; данные Spaces и метаданные видны Synapse; для публичной эксплуатации необходимы HTTPS и независимый аудит.

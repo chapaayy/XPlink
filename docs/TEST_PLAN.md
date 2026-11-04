@@ -31,3 +31,7 @@ E2E: `tests/e2e/recovery-devices.spec.ts` использует два незав
 - Playwright `stage3-spaces-roles.spec.ts`: создание приватного Workspace, вложенной категории и E2EE-канала, приглашение второго пользователя, read-only power levels, HTTP 403 при прямом запросе записи `m.room.power_levels` без прав, повышение до moderator 50 и разрешённая зашифрованная отправка.
 - Полный прогон объединяет регрессии этапов 1–2, `pnpm docs:check`, Prettier, ESLint, TS strict, Vitest, Vite production build, Docker restart persistence. Все тестовые аккаунты изолированы.
 - Эти тесты проверяют конкретные сценарии, **но не** заменяют независимый security review, security testing of arbitrary file formats, DoS/large media и продакшен backup/restore.
+
+## Этап 3 — результат приёмки
+
+[GitHub Actions #41846507062](https://github.com/chapaayy/XPlink/actions/runs/41846507062) — 7/7 E2E прошли. В `stage3-spaces-roles.spec.ts` дополнительно проверена прямая HTTP-попытка отправить `m.room.encrypted` без необходимого power level: Synapse возвращает 403 `M_FORBIDDEN`; это не ограничение интерфейса. В `stage3-dm-media.spec.ts` проверены DM, реакции, ciphertext на сервере и восстановление файлового содержимого только на клиенте. После перезапуска PostgreSQL/Synapse сохранились 8 комнат. Проверки не заменяют аудит, отдельные права каждого пространства не наследуются в каналы.
