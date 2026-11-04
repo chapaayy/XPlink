@@ -39,6 +39,7 @@ export function WorkspaceRail({ client, activeSpace, onSelect, revision }: Props
           title={space.name}
           aria-label={'Пространство ' + space.name}
           className={'rail-pill ' + (activeSpace === space.id ? 'rail-active' : '')}
+          aria-pressed={activeSpace === space.id}
           onClick={() => onSelect(space.id)}
         >
           {space.name.slice(0, 2).toUpperCase()}

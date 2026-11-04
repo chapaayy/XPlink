@@ -25,6 +25,7 @@ export function DirectChats({ client, selectedRoomId, onSelect, revision }: Prop
             <button
               key={id}
               className={id === selectedRoomId ? 'room-link selected' : 'room-link'}
+              aria-current={id === selectedRoomId ? 'page' : undefined}
               data-testid="dm-link"
               data-room-id={id}
               onClick={() => onSelect(id)}
