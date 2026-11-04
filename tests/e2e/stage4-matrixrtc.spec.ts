@@ -66,10 +66,33 @@ test('MatrixRTC authorizes three participants in an E2EE voice channel', async (
     const data = (await transport.json()) as { rtc_transports?: Array<{ type: string }> };
     expect(data.rtc_transports?.some((entry) => entry.type === 'livekit')).toBe(true);
 
-    const noAuth = await request.get(
-      '/_matrix/client/unstable/io.element.msc4195/rtc/livekit/sfu/get',
-    );
-    expect(noAuth.ok()).toBe(false);
+    // Test the real authorization endpoint with a syntactically valid RTC
+    // token request. A user outside this private Matrix room must be refused
+    // by Synapse/JWT membership checks, not just by a hidden UI button.
+    const tokenPath = '/_matrix/client/unstable/io.element.msc4195/rtc/livekit/get_token';
+    const tokenRequest = {
+      url: 'ws://xplink.localhost:8080/livekit/sfu',
+      room_id: roomId,
+      slot_id: 'test-slot',
+      member_id: 'test-member',
+    };
+    const noAuth = await request.post(tokenPath, { data: tokenRequest });
+    expect(noAuth.status()).toBe(401);
+    const login = await request.post('/_matrix/client/v3/login', {
+      data: {
+        type: 'm.login.password',
+        identifier: { type: 'm.id.user', user: 'outsidertc' },
+        password,
+      },
+    });
+    expect(login.ok()).toBeTruthy();
+    const outsider = (await login.json()) as { access_token?: string };
+    if (!outsider.access_token) throw new Error('Outside Matrix session missing');
+    const denied = await request.post(tokenPath, {
+      headers: { Authorization: 'Bearer ' + outsider.access_token },
+      data: tokenRequest,
+    });
+    expect([403, 404], 'nonmembers must not receive a LiveKit JWT').toContain(denied.status());
 
     // A call must pass E2EE authorization before the component can start media.
     await alice.getByRole('button', { name: 'Начать голосовой звонок' }).click();
