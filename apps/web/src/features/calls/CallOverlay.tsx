@@ -48,6 +48,10 @@ export function CallOverlay({ client, target, onClose, onError }: Props) {
   const [joined, setJoined] = useState(false);
   const [busy, setBusy] = useState(false);
   const handle = useRef<ElementCallHandle>(null);
+  const onCloseRef = useRef(onClose);
+  const onErrorRef = useRef(onError);
+  onCloseRef.current = onClose;
+  onErrorRef.current = onError;
   const intent = useMemo(() => callIntent(target), [target]);
   useEffect(() => {
     let alive = true;
@@ -57,14 +61,14 @@ export function CallOverlay({ client, target, onClose, onError }: Props) {
       })
       .catch(() => {
         if (alive) {
-          onError('Звонок заблокирован: MatrixRTC недоступен или E2EE комнаты не подтверждено.');
-          onClose();
+          onErrorRef.current('Звонок заблокирован: MatrixRTC недоступен или E2EE комнаты не подтверждено.');
+          onCloseRef.current();
         }
       });
     return () => {
       alive = false;
     };
-  }, [client, target, onClose, onError]);
+  }, [client, target]);
   const finish = async () => {
     if (busy) return;
     setBusy(true);
