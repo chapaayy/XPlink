@@ -55,6 +55,7 @@ export function RoomList({
                 data-testid="room-link"
                 data-room-id={room.id}
                 className={room.id === selectedRoomId ? 'room-link selected' : 'room-link'}
+                aria-current={room.id === selectedRoomId ? 'page' : undefined}
                 onClick={() => onSelect(room.id)}
               >
                 <span>{isVoiceRoom(client, room.id) ? '🔊' : room.encrypted ? '🔒' : '⚠️'}</span>

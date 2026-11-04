@@ -121,7 +121,13 @@ export function SpaceNavigation({ client, spaceId, selectedRoomId, onSelect, rev
         )}
         <input
           id="space-new-name"
-          placeholder={kind === 'category' ? 'Название категории' : kind === 'voice' ? 'Название голосового канала' : 'Название канала'}
+          placeholder={
+            kind === 'category'
+              ? 'Название категории'
+              : kind === 'voice'
+                ? 'Название голосового канала'
+                : 'Название канала'
+          }
           value={name}
           onChange={(event) => setName(event.target.value)}
           required

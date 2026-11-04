@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
 import { addReaction, downloadEncryptedAttachment, roomMessages } from '@xplink/matrix-adapter';
 import type { ChatAttachment } from '@xplink/matrix-adapter';
@@ -12,10 +12,15 @@ interface Props {
 export function MessageTimeline({ client, roomId, revision }: Props) {
   const bottom = useRef<HTMLDivElement>(null);
   const [error, setError] = useState('');
-  void revision;
-  const messages = roomMessages(client, roomId);
+  const [visibleLimit, setVisibleLimit] = useState(100);
+  const messages = useMemo(() => roomMessages(client, roomId), [client, roomId, revision]);
+  const visibleMessages = messages.slice(-visibleLimit);
   useEffect(() => {
-    bottom.current?.scrollIntoView({ behavior: 'smooth' });
+    setVisibleLimit(100);
+  }, [roomId]);
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    bottom.current?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
     setError('');
   }, [roomId, messages.length]);
 
@@ -37,7 +42,13 @@ export function MessageTimeline({ client, roomId, revision }: Props) {
   };
 
   return (
-    <section aria-label="Сообщения" className="timeline">
+    <section
+      aria-label="Сообщения"
+      className="timeline"
+      role="log"
+      aria-live="polite"
+      aria-relevant="additions"
+    >
       {error && (
         <p role="alert" className="error">
           {error}
@@ -48,7 +59,16 @@ export function MessageTimeline({ client, roomId, revision }: Props) {
           Начало защищённой переписки. Сервер не получает текст сообщений.
         </p>
       )}
-      {messages.map((message) => (
+      {messages.length > visibleLimit && (
+        <button
+          type="button"
+          className="show-older-messages"
+          onClick={() => setVisibleLimit((n) => n + 100)}
+        >
+          Показать предыдущие сообщения
+        </button>
+      )}
+      {visibleMessages.map((message) => (
         <article className="message" key={message.id} data-event-id={message.id}>
           <div className="message-meta">
             <strong>{message.sender}</strong>

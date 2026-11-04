@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
 import {
   assertEncryptedRoom,
@@ -21,6 +21,9 @@ import { CreateVoiceRoomForm } from '../features/calls/CreateVoiceRoomForm';
 import type { CallTarget } from '@xplink/rtc-adapter';
 import { directRoomIds as listDirectRooms } from '@xplink/matrix-adapter';
 import { SecurityPanel } from '../features/security/SecurityPanel';
+import { NotificationSettings } from '../features/notifications/NotificationSettings';
+import { usePrivateNotifications } from '../features/notifications/usePrivateNotifications';
+import { InstallControls } from '../features/pwa/InstallControls';
 
 interface Props {
   secretAccess: SecretStorageAccess;
@@ -31,7 +34,9 @@ interface Props {
 }
 
 export function AppShell({ client, revision, userId, onLogout, secretAccess }: Props) {
+  usePrivateNotifications(client);
   const [selected, setSelected] = useState<string | null>(null);
+  const chatHeading = useRef<HTMLElement>(null);
   const [selectedSpace, setSelectedSpace] = useState<string | null>(null);
   const [rightPanel, setRightPanel] = useState<'security' | 'roles' | null>(null);
   const [securityState, setSecurityState] = useState('');
@@ -40,6 +45,16 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
   const rooms = listRooms(client);
   const active = rooms.find((room) => room.id === selected && room.membership === 'join');
   const encrypted = Boolean(active?.encrypted);
+  useEffect(() => {
+    if (active?.id) chatHeading.current?.focus();
+  }, [active?.id]);
+  useEffect(() => {
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setRightPanel(null);
+    };
+    window.addEventListener('keydown', onEscape);
+    return () => window.removeEventListener('keydown', onEscape);
+  }, []);
   const spaces = listSpaces(client);
   const nested = spaces.flatMap((space) => childRoomIds(client, space.id));
   const direct = [...directRoomIds(client)];
@@ -55,6 +70,7 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
   };
   const selectRoom = async (id: string) => {
     setSelected(id);
+    setRightPanel(null);
     try {
       await assertEncryptedRoom(client, id);
       setSecurityState('');
@@ -63,7 +79,10 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
     }
   };
   return (
-    <div className="app-layout">
+    <div className="app-layout" data-mobile-pane={active ? 'chat' : 'channels'}>
+      <a className="skip-link" href={active ? '#main-content' : '#channel-navigation'}>
+        Перейти к содержимому
+      </a>
       <WorkspaceRail
         client={client}
         activeSpace={selectedSpace}
@@ -73,7 +92,7 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
           setSelected(null);
         }}
       />
-      <aside className="sidebar">
+      <aside className="sidebar" id="channel-navigation" aria-label="Список каналов">
         <header className="sidebar-header">
           <div>
             <h1>XPlink</h1>
@@ -129,12 +148,25 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
           </button>
         </footer>
       </aside>
-      <main className="chat-area">
+      <main className="chat-area" id="main-content" tabIndex={-1}>
         {active ? (
           <>
             <header className="chat-header">
+              <button
+                type="button"
+                className="mobile-back"
+                aria-label="Назад к каналам"
+                onClick={() => {
+                  setSelected(null);
+                  setRightPanel(null);
+                }}
+              >
+                ← Каналы
+              </button>
               <div>
-                <strong># {active.name}</strong>
+                <strong ref={chatHeading} tabIndex={-1}>
+                  # {active.name}
+                </strong>
                 <small>🔒 E2EE Matrix / Rust Crypto</small>
               </div>
               <div className="call-header-controls">
@@ -207,16 +239,36 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
       )}
       {rightPanel === 'security' && (
         <aside className="security-panel" aria-label="Безопасность">
+          <button
+            type="button"
+            className="panel-close"
+            onClick={() => setRightPanel(null)}
+            aria-label="Закрыть панель"
+          >
+            ✕ Закрыть
+          </button>
           <SecurityPanel
             client={client}
             secretAccess={secretAccess}
             roomId={active?.id ?? null}
             revision={revision}
           />
+          <NotificationSettings />
+          <InstallControls />
         </aside>
       )}
       {rightPanel === 'roles' && encrypted && active && (
-        <ChannelPermissions client={client} roomId={active.id} revision={revision} />
+        <aside className="roles-panel-wrapper" aria-label="Участники и права">
+          <button
+            type="button"
+            className="panel-close"
+            onClick={() => setRightPanel(null)}
+            aria-label="Закрыть панель"
+          >
+            ✕ Закрыть
+          </button>
+          <ChannelPermissions client={client} roomId={active.id} revision={revision} />
+        </aside>
       )}
     </div>
   );

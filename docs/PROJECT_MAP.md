@@ -48,3 +48,13 @@
 | Голосовые комнаты                | `packages/matrix-adapter/src/voice.ts`, `CreateVoiceRoomForm.tsx`                 | Только приватный E2EE room state                                |
 | SFU и JWT сервис                 | `deploy/compose.dev.yml`, `services/synapse/enable_rtc.py`, `scripts/init-rtc.sh` | Секреты не попадут в Git; no auto-create                        |
 | RTC CI                           | `tests/e2e/stage4-matrixrtc.spec.ts`                                              | Реальные браузеры и Synapse                                     |
+
+## Этап 5 — PWA, уведомления и mobile UX
+
+| Задача                         | Модуль                                                                                          | Ограничение                                     |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Телефон, фокус, Escape, motion | `AppShell.tsx`, `shared/styles/stage5.css`                                                      | Не создавать новый MatrixClient                 |
+| Offline/install                | `public/sw.js`, `public/manifest.webmanifest`, `app/pwa.ts`, `features/pwa/InstallControls.tsx` | Только публичные offline и icons в CacheStorage |
+| Уведомления                    | `features/notifications/`                                                                       | Opt-in, hidden only, generic text; no plaintext |
+| Подписки Matrix                | `app/use-matrix.ts`                                                                             | Отписка Decrypted/Timeline/Sync при lifecycle   |
+| Проверки                       | `tests/e2e/stage5-pwa-mobile.spec.ts`, `notification-policy.test.ts`                            | Browser + privacy                               |

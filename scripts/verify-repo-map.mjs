@@ -10,13 +10,18 @@ function walk(dir) {
   for (const item of readdirSync(join(root, dir), { withFileTypes: true })) {
     const path = relative(root, join(root, dir, item.name)).replaceAll('\\', '/');
     if (item.isDirectory()) walk(path);
-    else if (/\.(tsx?|mjs|py|sh|ya?ml)$/.test(item.name) && !paths.has(path))
+    else if (
+      /\.(tsx?|mjs|js|py|sh|ya?ml|webmanifest|html|png)$/.test(item.name) &&
+      !paths.has(path)
+    )
       errors.push(`Unindexed source: ${path}`);
   }
 }
 for (const dir of [
   'apps/web/src',
+  'apps/web/public',
   'packages/matrix-adapter/src',
+  'packages/rtc-adapter/src',
   'scripts',
   'deploy',
   '.github/workflows',

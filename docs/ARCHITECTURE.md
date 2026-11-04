@@ -45,3 +45,18 @@ XPlink React (единственный MatrixClient, Rust Crypto)
 Новые процессы в локальном Docker: `lk-jwt-service`, `livekit`, существующие Synapse/Caddy. Ключи SFU генерируются локально с mode 0600, JWT выдаётся авторизованному пользователю. `room.auto_create: false` на SFU; `LIVEKIT_FULL_ACCESS_HOMESERVERS=localhost` вместо wildcard. Медиа не проходит через собственный сервер XPlink, клиент использует официальный upstream SDK. В браузере только один MatrixClient с Rust Crypto. Для developer loopback используются HTTP/WS; это **не публичная конфигурация**.
 
 **Решение по встроенному компоненту:** ADR-0003 фиксирует выбор официального Element Call React component вместо самописного widget driver. Его API является экспериментальным и AGPL-3.0; компонент допускает замену на widget через границу rtc-adapter. Нельзя утверждать E2EE без реальной многопользовательской проверки.
+
+## Этап 5 — frontend-only boundary
+
+```text
+MatrixClient (один Rust Crypto store)
+  ├─ AppShell: mobile channel/chat, focus, accessible panels
+  └─ usePrivateNotifications: RoomEvent.Timeline -> gated generic OS notification
+Browser UI:
+  ├─ NotificationSettings -> localStorage one opt-in bit, no plaintext
+  ├─ InstallControls -> beforeinstallprompt (user action)
+  └─ registerOfflineShell (production only) -> SW navigation network-first
+                                                   -> cached offline.html + two PUBLIC PNGs
+```
+
+Сервисный работник не подключается к Matrix, не хранит события и не считывает crypto/session. `use-matrix.ts` освобождает обработчики расшифровки событий и MatrixClient по lifecycle. Внешние push/backends не добавлялись. RTC остаётся в отдельном пакете этапа 4.

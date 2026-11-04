@@ -83,3 +83,19 @@
 | `services/synapse/enable_rtc.py` | Secret management and homeserver config migration | python CLI | PyYAML, appservice | Docker E2E | 2026-11-04 |
 | `tests/e2e/stage4-matrixrtc.spec.ts` | Three-browser MatrixRTC authorization and secure call UI smoke | Playwright E2E | LiveKit, JWT, Synapse | CI RTC E2E | 2026-11-04 |
 | `.github/workflows/bootstrap-stage4.yml` | Resolve pinned RTC packages, format and lock on feature branch | GHA workflow | pnpm | CI quality | 2026-11-04 |
+| `apps/web/index.html` | App entrypoint with PWA manifest and icon | HTML document | Vite app | PWA E2E | 2026-11-04 |
+| `apps/web/public/manifest.webmanifest` | Installable standalone app metadata | Web app manifest | PWA icons | PWA E2E | 2026-11-04 |
+| `apps/web/public/offline.html` | Generic offline fallback | Offline document | Service Worker | PWA E2E | 2026-11-04 |
+| `apps/web/public/sw.js` | Public-only offline cache and notification focusing | Service Worker | Cache Storage | PWA E2E | 2026-11-04 |
+| `apps/web/public/icons/xplink-192.png` | Public PWA icon 192x192 | PNG | Manifest | PWA E2E | 2026-11-04 |
+| `apps/web/public/icons/xplink-512.png` | Public PWA icon 512x512 | PNG | Manifest | PWA E2E | 2026-11-04 |
+| `apps/web/src/app/pwa.ts` | Production-only offline worker registration | registerOfflineShell | Browser | PWA E2E | 2026-11-04 |
+| `apps/web/src/features/pwa/InstallControls.tsx` | User-controlled PWA installation | InstallControls | React | PWA E2E | 2026-11-04 |
+| `apps/web/src/features/notifications/preferences.ts` | Non-sensitive opt-in bit | notificationOptIn | localStorage | Unit and E2E | 2026-11-04 |
+| `apps/web/src/features/notifications/notification-policy.ts` | Privacy-preserving notification gate | shouldNotify | None | Vitest | 2026-11-04 |
+| `apps/web/src/features/notifications/notification-policy.test.ts` | Negative notification privacy tests | Vitest | Policy module | CI unit | 2026-11-04 |
+| `apps/web/src/features/notifications/NotificationSettings.tsx` | Explicit browser permission controls | NotificationSettings | Browser Notifications | PWA E2E | 2026-11-04 |
+| `apps/web/src/features/notifications/usePrivateNotifications.ts` | Generic notifications for new decrypted events | usePrivateNotifications | Matrix SDK | PWA E2E | 2026-11-04 |
+| `apps/web/src/shared/styles/stage5.css` | Responsive mobile and accessible layout | Styles | AppShell | PWA E2E | 2026-11-04 |
+| `tests/e2e/stage5-pwa-mobile.spec.ts` | Real offline, privacy, mobile, permission acceptance | Playwright | Chromium | CI E2E | 2026-11-04 |
+| `.github/workflows/stage5-format.yml` | One-off Prettier and deterministic file index on Stage 5 branch | GitHub Actions | pnpm + Node | CI quality | 2026-11-04 |

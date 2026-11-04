@@ -18,6 +18,19 @@ export function useMatrix(session: StoredSession | null, secretAccess: SecretSto
     let cancelled = false;
     let activeClient: MatrixClient | undefined;
     let releaseTab: (() => void) | null = null;
+    const pending = new Map<import('matrix-js-sdk').MatrixEvent, () => void>();
+    const onTimeline = (event: import('matrix-js-sdk').MatrixEvent) => {
+      if (event.getType() === 'm.room.encrypted' && !pending.has(event)) {
+        const decrypted = () => {
+          event.off(MatrixEventEvent.Decrypted, decrypted);
+          pending.delete(event);
+          update();
+        };
+        pending.set(event, decrypted);
+        event.on(MatrixEventEvent.Decrypted, decrypted);
+      }
+      update();
+    };
     const update = () => {
       if (!cancelled) setRevision((old) => old + 1);
     };
@@ -45,10 +58,7 @@ export function useMatrix(session: StoredSession | null, secretAccess: SecretSto
           return;
         }
         activeClient.on(ClientEvent.Sync, sync);
-        activeClient.on(RoomEvent.Timeline, (event) => {
-          event.on(MatrixEventEvent.Decrypted, update);
-          update();
-        });
+        activeClient.on(RoomEvent.Timeline, onTimeline);
         setClient(activeClient);
         setStatus('syncing');
         await activeClient.startClient({ initialSyncLimit: 50 });
@@ -64,6 +74,10 @@ export function useMatrix(session: StoredSession | null, secretAccess: SecretSto
     void initialize();
     return () => {
       cancelled = true;
+      activeClient?.off(RoomEvent.Timeline, onTimeline);
+      activeClient?.off(ClientEvent.Sync, sync);
+      for (const [event, decrypted] of pending) event.off(MatrixEventEvent.Decrypted, decrypted);
+      pending.clear();
       activeClient?.stopClient();
       releaseTab?.();
     };

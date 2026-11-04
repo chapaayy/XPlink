@@ -42,3 +42,10 @@ E2E: `tests/e2e/recovery-devices.spec.ts` использует два незав
 - E2E `tests/e2e/stage4-matrixrtc.spec.ts`: три независимых клиента получают доступ к одной E2EE-голосовой комнате, Synapse сообщает транспорт, JWT service отказывает в неавторизованном доступе, все три клиента запускают официальный Element Call и закрывают его.
 - Для полной приёмки: реальная передача аудио/видео между 3 участниками, микрофон mute/unmute, демонстрация экрана, leave/rejoin, отказ неучастнику в JWT, подтверждение E2EE встроенным MatrixRTC, отсутствие plaintext у SFU. До успешных проверок **не отмечать этап как принятый**.
 - `healthcheck.sh` проверяет не только web и Synapse, но также LiveKit и JWT. `init-rtc.sh` не должен менять существующие Synapse signing keys, пользователя и recovery ключи.
+
+## Этап 5 — PWA, accessibility и приватные уведомления
+
+- Unit: `apps/web/src/features/notifications/notification-policy.test.ts` проверяет все восемь обязательных условий: opt-in, OS-permission, hidden tab, E2EE wire event, новый incoming, live, decrypted, supported event type. Если хоть одно условие не выполнено, OS-уведомления нет. Title/body не содержат идентификаторов и plaintext.
+- Browser: `tests/e2e/stage5-pwa-mobile.spec.ts` проверяет manifest и PNG 192/512, регистрацию SW в dev только по явному вызову теста, отключение сети и offline fallback, CacheStorage из ровно трёх публичных ресурсов. Другой тест — viewport 390x844: переключение канал/чат, управление фокусом, permission opt-in/off, ESC dismiss.
+- Manual: реальные Android/iOS установки, VoiceOver/TalkBack, 320–1440px, reduced motion, screen reader contrast, browser notifications in background, проверить отсутствие native push после закрытия приложения.
+- Security: никаких Matrix API, token, session, media, plaintext и JS bundle в caches. Обновления SW не могут мигрировать sensitive storage. Production CSP/HTTPS в этапе 6, аудит безопасности нужен до запуска.

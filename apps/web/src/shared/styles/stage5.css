@@ -1,0 +1,207 @@
+/* Stage 5: accessible responsive layout without changing Matrix or call ownership. */
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: -100px;
+  z-index: 110;
+  background: #f2edff;
+  color: #16131e;
+  padding: 12px 18px;
+  border-radius: 8px;
+}
+.skip-link:focus {
+  top: 12px;
+}
+.mobile-back {
+  display: none;
+}
+.panel-close {
+  align-self: stretch;
+  background: #353044;
+  color: #f6edff;
+  padding: 11px 14px;
+  border-radius: 8px;
+  margin: 0 0 12px;
+}
+.roles-panel-wrapper {
+  width: 340px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #191a21;
+}
+.roles-panel-wrapper .panel-close {
+  margin: 12px;
+}
+.roles-panel-wrapper .permissions-panel {
+  flex: 1;
+  width: 100%;
+  overflow: auto;
+}
+.app-layout:has(.roles-panel-wrapper) {
+  grid-template-columns: 72px 290px minmax(0, 1fr) 340px;
+}
+.app-layout:has(.roles-panel-wrapper) .chat-area {
+  min-width: 0;
+}
+.chat-header > div:first-of-type {
+  min-width: 0;
+}
+.chat-header strong {
+  overflow-wrap: anywhere;
+}
+.chat-area,
+.sidebar,
+.sidebar-scroll {
+  min-height: 0;
+}
+.security-panel,
+.roles-panel-wrapper {
+  overflow-y: auto;
+}
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid #cebaff;
+  outline-offset: 2px;
+}
+@media (max-width: 1080px) {
+  .app-layout:has(.roles-panel-wrapper) {
+    grid-template-columns: 60px 220px minmax(0, 1fr) 280px;
+  }
+  .roles-panel-wrapper {
+    width: 280px;
+  }
+}
+@media (max-width: 780px) {
+  .app-layout {
+    grid-template-columns: 54px minmax(0, 1fr);
+    min-height: 0;
+    height: 100dvh;
+  }
+  .workspace-rail {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    overflow-y: auto;
+  }
+  .sidebar,
+  .chat-area {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    width: 100%;
+  }
+  .app-layout[data-mobile-pane='channels'] .chat-area {
+    display: none;
+  }
+  .app-layout[data-mobile-pane='chat'] .sidebar {
+    display: none;
+  }
+  .chat-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .chat-header > div:first-of-type {
+    flex: 1;
+  }
+  .chat-header .mobile-back {
+    display: block;
+    background: #393147;
+    color: #e9dcff;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+  .call-header-controls {
+    flex-direction: row;
+    margin: 0;
+  }
+  .chat-permissions {
+    margin-left: auto;
+  }
+  .timeline {
+    min-height: 0;
+  }
+  .sidebar-header {
+    padding: 15px 12px;
+  }
+  .room-link,
+  .invite-button {
+    font-size: 14px;
+    padding: 12px 9px;
+    min-height: 44px;
+  }
+  .app-layout:has(.security-panel),
+  .app-layout:has(.roles-panel-wrapper) {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+  .app-layout:has(.security-panel) .sidebar,
+  .app-layout:has(.security-panel) .chat-area,
+  .app-layout:has(.roles-panel-wrapper) .sidebar,
+  .app-layout:has(.roles-panel-wrapper) .chat-area {
+    display: none;
+  }
+  .security-panel,
+  .roles-panel-wrapper {
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 12px;
+  }
+  .roles-panel-wrapper .permissions-panel {
+    display: flex;
+    width: 100%;
+    padding: 8px;
+  }
+  .rail-popover {
+    top: 60px;
+    left: 48px;
+    width: min(260px, calc(100vw - 65px));
+  }
+}
+@media (max-width: 480px) {
+  .call-header-controls button {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+  .chat-header small {
+    display: none;
+  }
+  .composer {
+    padding: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.show-older-messages {
+  display: block;
+  margin: 0 auto 18px;
+  padding: 10px 15px;
+  background: #343144;
+  border: 1px solid #58516d;
+  border-radius: 9px;
+  color: #eee6ff;
+}
+.show-older-messages:focus-visible {
+  outline: 2px solid #cebaff;
+  outline-offset: 2px;
+}
