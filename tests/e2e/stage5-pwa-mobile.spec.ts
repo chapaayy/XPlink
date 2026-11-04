@@ -34,16 +34,18 @@ test('installable manifest and offline fallback never cache private Matrix data'
       const response = await fetch('/_matrix/client/versions');
       if (!response.ok) throw new Error('Matrix gateway offline before test');
       const names = await caches.keys();
-      const cached = await Promise.all(names.map(async (name) => ({
-        name,
-        urls: (await (await caches.open(name)).keys()).map((req) => new URL(req.url).pathname),
-      })));
+      const cached = await Promise.all(
+        names.map(async (name) => ({
+          name,
+          urls: (await (await caches.open(name)).keys()).map((req) => new URL(req.url).pathname),
+        })),
+      );
       return cached;
     });
     expect(keys).toHaveLength(1);
-    expect(keys[0].urls.sort()).toEqual([
-      '/icons/xplink-192.png', '/icons/xplink-512.png', '/offline.html',
-    ].sort());
+    expect(keys[0].urls.sort()).toEqual(
+      ['/icons/xplink-192.png', '/icons/xplink-512.png', '/offline.html'].sort(),
+    );
     expect(JSON.stringify(keys)).not.toMatch(/_matrix|livekit|session|access_token|m\.room/);
     await context.setOffline(true);
     await page.reload();
@@ -84,13 +86,19 @@ test('mobile channel navigation, focus, keyboard dismissal and explicit notifica
     await page.getByRole('button', { name: 'Безопасность и устройства' }).click();
     await expect(page.getByRole('region', { name: 'Уведомления' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Включить уведомления' })).toBeVisible();
-    expect(await page.evaluate(() => localStorage.getItem('xplink.private-notifications.v1'))).toBeNull();
+    expect(
+      await page.evaluate(() => localStorage.getItem('xplink.private-notifications.v1')),
+    ).toBeNull();
 
     await page.getByRole('button', { name: 'Включить уведомления' }).click();
     await expect(page.getByRole('button', { name: 'Выключить уведомления' })).toBeVisible();
-    expect(await page.evaluate(() => localStorage.getItem('xplink.private-notifications.v1'))).toBe('1');
+    expect(await page.evaluate(() => localStorage.getItem('xplink.private-notifications.v1'))).toBe(
+      '1',
+    );
     await page.getByRole('button', { name: 'Выключить уведомления' }).click();
-    expect(await page.evaluate(() => localStorage.getItem('xplink.private-notifications.v1'))).toBeNull();
+    expect(
+      await page.evaluate(() => localStorage.getItem('xplink.private-notifications.v1')),
+    ).toBeNull();
 
     await page.keyboard.press('Escape');
     await expect(page.getByRole('region', { name: 'Уведомления' })).toHaveCount(0);

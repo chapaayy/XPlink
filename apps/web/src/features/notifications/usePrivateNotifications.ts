@@ -7,9 +7,8 @@ import { GENERIC_NOTIFICATION_BODY, shouldNotify } from './notification-policy';
 /** The OS never receives plaintext, user IDs, room IDs or event IDs. */
 async function deliverGenericNotification(): Promise<void> {
   try {
-    const registration = 'serviceWorker' in navigator
-      ? await navigator.serviceWorker.getRegistration()
-      : undefined;
+    const registration =
+      'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : undefined;
     if (registration?.active) {
       await registration.showNotification('XPlink', {
         body: GENERIC_NOTIFICATION_BODY,
@@ -26,7 +25,10 @@ async function deliverGenericNotification(): Promise<void> {
       tag: 'xplink-new-message',
       silent: true,
     });
-    note.onclick = () => { window.focus(); note.close(); };
+    note.onclick = () => {
+      window.focus();
+      note.close();
+    };
   } catch {
     // Notifications are best-effort; never log message metadata or throw.
   }

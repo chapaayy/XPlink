@@ -18,8 +18,8 @@ export function NotificationSettings() {
     setError('');
     try {
       // Request permission only from the direct button click. Never on mount.
-      const result = Notification.permission === 'granted'
-        ? 'granted' : await Notification.requestPermission();
+      const result =
+        Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
       setPermission(result);
       if (result !== 'granted') {
         disable();
@@ -36,14 +36,39 @@ export function NotificationSettings() {
   return (
     <section className="security-section" aria-label="Уведомления">
       <h2>Уведомления</h2>
-      <p>По умолчанию выключены. Показываются только при открытом XPlink в фоновой вкладке. В уведомлении нет текста, имени отправителя и названия комнаты.</p>
-      <p className="muted">Разрешение браузера: {permission === 'granted' ? 'разрешено' : permission === 'denied' ? 'запрещено' : permission === 'default' ? 'не запрошено' : 'не поддерживается'}.</p>
+      <p>
+        По умолчанию выключены. Показываются только при открытом XPlink в фоновой вкладке. В
+        уведомлении нет текста, имени отправителя и названия комнаты.
+      </p>
+      <p className="muted">
+        Разрешение браузера:{' '}
+        {permission === 'granted'
+          ? 'разрешено'
+          : permission === 'denied'
+            ? 'запрещено'
+            : permission === 'default'
+              ? 'не запрошено'
+              : 'не поддерживается'}
+        .
+      </p>
       {enabled && permission === 'granted' ? (
-        <button type="button" className="neutral-button" onClick={disable}>Выключить уведомления</button>
+        <button type="button" className="neutral-button" onClick={disable}>
+          Выключить уведомления
+        </button>
       ) : (
-        <button type="button" onClick={() => void enable()} disabled={!supported || permission === 'denied'}>Включить уведомления</button>
+        <button
+          type="button"
+          onClick={() => void enable()}
+          disabled={!supported || permission === 'denied'}
+        >
+          Включить уведомления
+        </button>
       )}
-      {error && <p role="alert" className="error">{error}</p>}
+      {error && (
+        <p role="alert" className="error">
+          {error}
+        </p>
+      )}
     </section>
   );
 }

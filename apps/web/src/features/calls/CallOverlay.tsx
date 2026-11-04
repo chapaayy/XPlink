@@ -62,7 +62,9 @@ export function CallOverlay({ client, target, onClose, onError }: Props) {
       })
       .catch(() => {
         if (alive) {
-          onErrorRef.current('Звонок заблокирован: MatrixRTC недоступен или E2EE комнаты не подтверждено.');
+          onErrorRef.current(
+            'Звонок заблокирован: MatrixRTC недоступен или E2EE комнаты не подтверждено.',
+          );
           onCloseRef.current();
         }
       });

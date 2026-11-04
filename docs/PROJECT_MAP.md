@@ -51,10 +51,10 @@
 
 ## Этап 5 — PWA, уведомления и mobile UX
 
-| Задача | Модуль | Ограничение |
-| --- | --- | --- |
-| Телефон, фокус, Escape, motion | `AppShell.tsx`, `shared/styles/stage5.css` | Не создавать новый MatrixClient |
-| Offline/install | `public/sw.js`, `public/manifest.webmanifest`, `app/pwa.ts`, `features/pwa/InstallControls.tsx` | Только публичные offline и icons в CacheStorage |
-| Уведомления | `features/notifications/` | Opt-in, hidden only, generic text; no plaintext |
-| Подписки Matrix | `app/use-matrix.ts` | Отписка Decrypted/Timeline/Sync при lifecycle |
-| Проверки | `tests/e2e/stage5-pwa-mobile.spec.ts`, `notification-policy.test.ts` | Browser + privacy |
+| Задача                         | Модуль                                                                                          | Ограничение                                     |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Телефон, фокус, Escape, motion | `AppShell.tsx`, `shared/styles/stage5.css`                                                      | Не создавать новый MatrixClient                 |
+| Offline/install                | `public/sw.js`, `public/manifest.webmanifest`, `app/pwa.ts`, `features/pwa/InstallControls.tsx` | Только публичные offline и icons в CacheStorage |
+| Уведомления                    | `features/notifications/`                                                                       | Opt-in, hidden only, generic text; no plaintext |
+| Подписки Matrix                | `app/use-matrix.ts`                                                                             | Отписка Decrypted/Timeline/Sync при lifecycle   |
+| Проверки                       | `tests/e2e/stage5-pwa-mobile.spec.ts`, `notification-policy.test.ts`                            | Browser + privacy                               |
