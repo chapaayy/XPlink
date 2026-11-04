@@ -191,3 +191,17 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+.show-older-messages {
+  display: block;
+  margin: 0 auto 18px;
+  padding: 10px 15px;
+  background: #343144;
+  border: 1px solid #58516d;
+  border-radius: 9px;
+  color: #eee6ff;
+}
+.show-older-messages:focus-visible {
+  outline: 2px solid #cebaff;
+  outline-offset: 2px;
+}
