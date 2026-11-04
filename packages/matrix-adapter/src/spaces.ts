@@ -84,7 +84,9 @@ export async function createSpaceChannel(
   invitee = '',
   voice = false,
 ): Promise<string> {
-  const id = voice ? await createVoiceRoom(client, name, invitee) : await createEncryptedRoom(client, name, invitee);
+  const id = voice
+    ? await createVoiceRoom(client, name, invitee)
+    : await createEncryptedRoom(client, name, invitee);
   await linkChild(client, parentId, id);
   return id;
 }

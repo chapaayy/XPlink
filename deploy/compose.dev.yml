@@ -45,7 +45,7 @@ services:
   livekit:
     image: livekit/livekit-server:v1.13.10
     restart: unless-stopped
-    command: ["--config", "/etc/livekit.yaml"]
+    command: ['--config', '/etc/livekit.yaml']
     volumes:
       - ../.local/rtc/livekit.yaml:/etc/livekit.yaml:ro
     ports:
@@ -55,7 +55,7 @@ services:
 
   lk-jwt:
     image: ghcr.io/element-hq/lk-jwt-service:0.9.0
-    user: "991:991"
+    user: '991:991'
     restart: unless-stopped
     environment:
       LIVEKIT_URL: ws://xplink.localhost:8080/livekit/sfu
@@ -65,7 +65,7 @@ services:
       LIVEKIT_AS_REGISTRATION_FILE: /run/synapse/rtc-appservice.yaml
       LIVEKIT_HS_SERVER_NAME: localhost
       LIVEKIT_CS_API_URL_OVERRIDES: localhost=http://synapse:8008
-      LIVEKIT_JWT_BIND: ":8080"
+      LIVEKIT_JWT_BIND: ':8080'
     volumes:
       - ../.local/rtc/secret:/run/rtc/secret:ro
       - ../.local/synapse/rtc-appservice.yaml:/run/synapse/rtc-appservice.yaml:ro

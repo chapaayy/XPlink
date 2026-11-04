@@ -7,9 +7,9 @@ test('MatrixRTC authorizes three participants in an E2EE voice channel', async (
   test.setTimeout(180_000);
   const password = process.env.XPLINK_TEST_PASSWORD;
   if (!password) throw new Error('CI RTC credentials missing');
-  const contexts = await Promise.all(Array.from({ length: 3 }, () =>
-    browser.newContext({ permissions: ['microphone', 'camera'] }),
-  ));
+  const contexts = await Promise.all(
+    Array.from({ length: 3 }, () => browser.newContext({ permissions: ['microphone', 'camera'] })),
+  );
   const pages = await Promise.all(contexts.map((ctx) => ctx.newPage()));
   const [alice, bob, carol] = pages;
   try {
@@ -32,17 +32,25 @@ test('MatrixRTC authorizes three participants in an E2EE voice channel', async (
       timeout: 25_000,
     });
 
-    const roomId = await alice.locator('[data-testid="room-link"]').last().getAttribute('data-room-id');
+    const roomId = await alice
+      .locator('[data-testid="room-link"]')
+      .last()
+      .getAttribute('data-room-id');
     if (!roomId) throw new Error('RTC room missing');
     const token = await alice.evaluate(() => {
-      const session = JSON.parse(sessionStorage.getItem('xplink.matrix.session.v1') ?? '{}') as { accessToken?: string };
+      const session = JSON.parse(sessionStorage.getItem('xplink.matrix.session.v1') ?? '{}') as {
+        accessToken?: string;
+      };
       return session.accessToken;
     });
     if (!token) throw new Error('Matrix access token missing');
-    const invite = await request.post('/_matrix/client/v3/rooms/' + encodeURIComponent(roomId) + '/invite', {
-      headers: { Authorization: 'Bearer ' + token },
-      data: { user_id: '@carolrtc:localhost' },
-    });
+    const invite = await request.post(
+      '/_matrix/client/v3/rooms/' + encodeURIComponent(roomId) + '/invite',
+      {
+        headers: { Authorization: 'Bearer ' + token },
+        data: { user_id: '@carolrtc:localhost' },
+      },
+    );
     expect(invite.ok()).toBeTruthy();
     await bob.getByRole('button', { name: /Принять приглашение/ }).click();
     await expect(carol.getByRole('button', { name: /Принять приглашение/ })).toBeVisible({

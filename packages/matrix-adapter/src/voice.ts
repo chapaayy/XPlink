@@ -3,11 +3,18 @@ import { Preset, Visibility } from 'matrix-js-sdk';
 
 export const VOICE_ROOM_STATE = 'io.xplink.voice';
 export function isVoiceRoom(client: MatrixClient, roomId: string): boolean {
-  return client.getRoom(roomId)?.currentState.getStateEvents(VOICE_ROOM_STATE, '')?.getContent()?.kind === 'voice';
+  return (
+    client.getRoom(roomId)?.currentState.getStateEvents(VOICE_ROOM_STATE, '')?.getContent()
+      ?.kind === 'voice'
+  );
 }
 
 /** Voice channels have real membership and E2EE, not just a client-side label. */
-export async function createVoiceRoom(client: MatrixClient, name: string, invitee = ''): Promise<string> {
+export async function createVoiceRoom(
+  client: MatrixClient,
+  name: string,
+  invitee = '',
+): Promise<string> {
   if (!client.getCrypto()) throw new Error('Rust Crypto необходим для голосового канала.');
   if (!name.trim()) throw new Error('Укажите название голосового канала.');
   const invite = invitee.trim();

@@ -4,7 +4,12 @@ import { authorizeRtcCall } from './call-session';
 import { isTrustedRtcUrl } from './transport';
 
 describe('stage-4 fail-closed RTC boundary', () => {
-  const call = { roomId: '!r:localhost', kind: 'voice' as const, direct: false, intent: 'start' as const };
+  const call = {
+    roomId: '!r:localhost',
+    kind: 'voice' as const,
+    direct: false,
+    intent: 'start' as const,
+  };
   it('refuses an unencrypted room even when transport exists', async () => {
     const client = {
       getRoom: () => ({ getMyMembership: () => 'join', hasEncryptionStateEvent: () => false }),
@@ -25,6 +30,8 @@ describe('stage-4 fail-closed RTC boundary', () => {
     expect(isTrustedRtcUrl('http://example.org/livekit/jwt', 'https://example.org')).toBe(false);
     expect(isTrustedRtcUrl('https://evil:pw@example.org/jwt', 'https://example.org')).toBe(false);
     expect(isTrustedRtcUrl('https://example.org/jwt', 'https://example.org')).toBe(true);
-    expect(isTrustedRtcUrl('http://localhost:8080/livekit/jwt', 'http://localhost:8080')).toBe(true);
+    expect(isTrustedRtcUrl('http://localhost:8080/livekit/jwt', 'http://localhost:8080')).toBe(
+      true,
+    );
   });
 });

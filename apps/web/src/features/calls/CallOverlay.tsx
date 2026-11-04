@@ -24,12 +24,16 @@ async function initialize(): Promise<void> {
 function callIntent(target: CallTarget): UserIntent {
   if (target.direct) {
     if (target.kind === 'voice') {
-      return target.intent === 'start' ? UserIntent.StartNewCallDMVoice : UserIntent.JoinExistingCallDMVoice;
+      return target.intent === 'start'
+        ? UserIntent.StartNewCallDMVoice
+        : UserIntent.JoinExistingCallDMVoice;
     }
     return target.intent === 'start' ? UserIntent.StartNewCallDM : UserIntent.JoinExistingCallDM;
   }
   if (target.kind === 'voice') {
-    return target.intent === 'start' ? UserIntent.StartNewCallVoice : UserIntent.JoinExistingCallVoice;
+    return target.intent === 'start'
+      ? UserIntent.StartNewCallVoice
+      : UserIntent.JoinExistingCallVoice;
   }
   return target.intent === 'start' ? UserIntent.StartNewCall : UserIntent.JoinExistingCall;
 }
@@ -48,29 +52,51 @@ export function CallOverlay({ client, target, onClose, onError }: Props) {
   useEffect(() => {
     let alive = true;
     void Promise.all([authorizeRtcCall(client, target), initialize()])
-      .then(() => { if (alive) setReady(true); })
+      .then(() => {
+        if (alive) setReady(true);
+      })
       .catch(() => {
         if (alive) {
           onError('Звонок заблокирован: MatrixRTC недоступен или E2EE комнаты не подтверждено.');
           onClose();
         }
       });
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [client, target, onClose, onError]);
   const finish = async () => {
     if (busy) return;
     setBusy(true);
     if (joined) {
-      try { await handle.current?.hangUp(); }
-      catch { /* Upstream may already have disconnected; closing releases UI. */ }
+      try {
+        await handle.current?.hangUp();
+      } catch {
+        /* Upstream may already have disconnected; closing releases UI. */
+      }
     }
     onClose();
   };
   return (
-    <section className="call-overlay" role="dialog" aria-modal="true" aria-label="Защищённый звонок">
+    <section
+      className="call-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Защищённый звонок"
+    >
       <header className="call-overlay-header">
-        <div><strong>{target.kind === 'voice' ? 'Голосовой звонок' : 'Видеозвонок'}</strong><small>{joined ? 'В звонке · E2EE' : 'Подключение к защищённому звонку'}</small></div>
-        <button type="button" onClick={() => void finish()} disabled={busy} aria-label="Завершить звонок">✕</button>
+        <div>
+          <strong>{target.kind === 'voice' ? 'Голосовой звонок' : 'Видеозвонок'}</strong>
+          <small>{joined ? 'В звонке · E2EE' : 'Подключение к защищённому звонку'}</small>
+        </div>
+        <button
+          type="button"
+          onClick={() => void finish()}
+          disabled={busy}
+          aria-label="Завершить звонок"
+        >
+          ✕
+        </button>
       </header>
       {ready ? (
         <Suspense fallback={<p className="call-loader">Загрузка защищённого звонка…</p>}>
@@ -84,15 +110,24 @@ export function CallOverlay({ client, target, onClose, onError }: Props) {
             config={{ confineToRoom: true, hideScreensharing: false }}
             hostBridge={{
               notifyJoined: async () => setJoined(true),
-              notifyHungUp: async () => { setJoined(false); onClose(); },
+              notifyHungUp: async () => {
+                setJoined(false);
+                onClose();
+              },
               close: async () => onClose(),
             }}
           />
         </Suspense>
-      ) : <p className="call-loader" role="status">Проверка E2EE, доступа к комнате и LiveKit…</p>}
+      ) : (
+        <p className="call-loader" role="status">
+          Проверка E2EE, доступа к комнате и LiveKit…
+        </p>
+      )}
       <footer className="call-overlay-footer">
         <span>Звук, видео, микрофон, выбор устройств и экран управляются в Element Call.</span>
-        <button type="button" onClick={() => void finish()} disabled={busy}>Покинуть звонок</button>
+        <button type="button" onClick={() => void finish()} disabled={busy}>
+          Покинуть звонок
+        </button>
       </footer>
     </section>
   );

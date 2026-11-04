@@ -46,7 +46,12 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
   const callInRoom = (kind: 'voice' | 'video', intent: 'start' | 'join' = 'start') => {
     if (!active || !active.encrypted) return;
     setCallError('');
-    setActiveCall({ roomId: active.id, kind, intent, direct: listDirectRooms(client).has(active.id) });
+    setActiveCall({
+      roomId: active.id,
+      kind,
+      intent,
+      direct: listDirectRooms(client).has(active.id),
+    });
   };
   const selectRoom = async (id: string) => {
     setSelected(id);
@@ -133,8 +138,20 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
                 <small>🔒 E2EE Matrix / Rust Crypto</small>
               </div>
               <div className="call-header-controls">
-                <button onClick={() => callInRoom('voice')} disabled={!encrypted} aria-label="Начать голосовой звонок">☎ Голос</button>
-                <button onClick={() => callInRoom('video')} disabled={!encrypted} aria-label="Начать видеозвонок">▣ Видео</button>
+                <button
+                  onClick={() => callInRoom('voice')}
+                  disabled={!encrypted}
+                  aria-label="Начать голосовой звонок"
+                >
+                  ☎ Голос
+                </button>
+                <button
+                  onClick={() => callInRoom('video')}
+                  disabled={!encrypted}
+                  aria-label="Начать видеозвонок"
+                >
+                  ▣ Видео
+                </button>
               </div>
               <button
                 className="chat-permissions"
@@ -144,7 +161,11 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
                 Участники и права
               </button>
             </header>
-            {callError && <div className="security-alert" role="alert">{callError}</div>}
+            {callError && (
+              <div className="security-alert" role="alert">
+                {callError}
+              </div>
+            )}
             {securityState && (
               <div className="security-alert" role="alert">
                 {securityState}
