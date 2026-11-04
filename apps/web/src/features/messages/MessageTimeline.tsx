@@ -15,7 +15,9 @@ export function MessageTimeline({ client, roomId, revision }: Props) {
   const [visibleLimit, setVisibleLimit] = useState(100);
   const messages = useMemo(() => roomMessages(client, roomId), [client, roomId, revision]);
   const visibleMessages = messages.slice(-visibleLimit);
-  useEffect(() => { setVisibleLimit(100); }, [roomId]);
+  useEffect(() => {
+    setVisibleLimit(100);
+  }, [roomId]);
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     bottom.current?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
@@ -40,7 +42,13 @@ export function MessageTimeline({ client, roomId, revision }: Props) {
   };
 
   return (
-    <section aria-label="Сообщения" className="timeline" role="log" aria-live="polite" aria-relevant="additions">
+    <section
+      aria-label="Сообщения"
+      className="timeline"
+      role="log"
+      aria-live="polite"
+      aria-relevant="additions"
+    >
       {error && (
         <p role="alert" className="error">
           {error}
@@ -52,7 +60,11 @@ export function MessageTimeline({ client, roomId, revision }: Props) {
         </p>
       )}
       {messages.length > visibleLimit && (
-        <button type="button" className="show-older-messages" onClick={() => setVisibleLimit((n) => n + 100)}>
+        <button
+          type="button"
+          className="show-older-messages"
+          onClick={() => setVisibleLimit((n) => n + 100)}
+        >
           Показать предыдущие сообщения
         </button>
       )}
