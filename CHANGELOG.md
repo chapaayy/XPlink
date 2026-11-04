@@ -33,3 +33,11 @@
 - Локальный SFU LiveKit v1.13.10, JWT appservice v0.9.0, Synapse RTC transport + appservice membership authorization, Caddy RTC прокси.
 - Идемпотентная настройка секретов и отрицательные тесты для незашифрованных комнат и небезопасных RTC URL.
 - Приёмка реального медиашифрования/доступа ожидает GitHub Actions E2E. В production **не использовать**.
+
+## 0.5.0 — Stage 5 UX/PWA (in progress)
+
+- Installable PWA с manifest + 192/512 PNG, статическим offline fallback и ограниченным публичным SW cache; приватная переписка офлайн не сохраняется.
+- Адаптивные каналы/чат на телефонах; focus management, Escape, skip link, aria-current и reduced motion.
+- Явный opt-in для уведомлений от открытой фоновой вкладки. В OS передаётся только generic XPlink-текст; не sender/room/plaintext. Нет remote push.
+- Закрытие подписок Matrix decryption/Sync/Timeline при смене клиента; ограничен рост обработчиков.
+- Добавлены unit policy tests и E2E на offline PWA, мобильную навигацию и согласие. Приёмка ожидает green CI.
