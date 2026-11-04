@@ -1,0 +1,22 @@
+/* Stage 4: persistent Element Call overlay, isolated from text/layout logic. */
+.call-header-controls { display: flex; gap: 8px; margin-left: auto; margin-right: 10px; }
+.call-header-controls button, .call-overlay-header button, .call-overlay-footer button {
+  border: 1px solid #5b5279; background: #35304c; color: #f4edff; padding: 9px 12px; border-radius: 9px;
+}
+.call-header-controls button:focus-visible, .call-overlay-header button:focus-visible { outline: 2px solid #b69bff; }
+.call-overlay {
+  position: fixed; z-index: 90; inset: min(4vh, 40px) 4vw; display: flex; flex-direction: column;
+  background: #15151d; border: 1px solid #4b4662; border-radius: 15px;
+  overflow: hidden; box-shadow: 0 16px 70px #000b; min-width: 290px; min-height: 330px;
+}
+.call-overlay-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 20px; border-bottom: 1px solid #31303e; }
+.call-overlay-header div { display: flex; flex-direction: column; gap: 4px; }
+.call-overlay-header small { color: #aaa6c5; }
+.call-overlay > div { min-height: 0; flex: 1; }
+.call-overlay-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 18px; border-top: 1px solid #34323f; }
+.call-overlay-footer span { font-size: 11px; color: #aaaac0; }
+.call-overlay-footer button { background: #703548; }
+.call-loader { margin: auto; padding: 25px; font-size: 14px; color: #cbc5ed; }
+.voice-room-create { margin: 0 8px 8px; }
+.voice-room-toggle { width: 100%; text-align: left; background: #292f3c; color: #d8c8ff; padding: 10px; border-radius: 8px; font-size: 12px; }
+@media(max-width:640px) { .call-overlay { inset: 0; border-radius: 0; } .call-header-controls { flex-direction: column; } .call-header-controls button { font-size: 11px; padding: 6px; } }
