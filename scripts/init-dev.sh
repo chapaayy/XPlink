@@ -36,4 +36,5 @@ else
     -e POSTGRES_PASSWORD -e MATRIX_SERVER_NAME \
     synapse /workspace/services/synapse/render_config.py
 fi
+bash scripts/init-rtc.sh
 echo 'Ready: docker compose --env-file .env -f deploy/compose.dev.yml up --build -d'
