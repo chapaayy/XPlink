@@ -630,5 +630,125 @@
     "dependencies": "pnpm",
     "test": "CI quality",
     "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/index.html",
+    "purpose": "App entrypoint with PWA manifest and icon",
+    "contract": "HTML document",
+    "dependencies": "Vite app",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/public/manifest.webmanifest",
+    "purpose": "Installable standalone app metadata",
+    "contract": "Web app manifest",
+    "dependencies": "PWA icons",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/public/offline.html",
+    "purpose": "Generic offline fallback",
+    "contract": "Offline document",
+    "dependencies": "Service Worker",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/public/sw.js",
+    "purpose": "Public-only offline cache and notification focusing",
+    "contract": "Service Worker",
+    "dependencies": "Cache Storage",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/public/icons/xplink-192.png",
+    "purpose": "Public PWA icon 192x192",
+    "contract": "PNG",
+    "dependencies": "Manifest",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/public/icons/xplink-512.png",
+    "purpose": "Public PWA icon 512x512",
+    "contract": "PNG",
+    "dependencies": "Manifest",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/app/pwa.ts",
+    "purpose": "Production-only offline worker registration",
+    "contract": "registerOfflineShell",
+    "dependencies": "Browser",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/pwa/InstallControls.tsx",
+    "purpose": "User-controlled PWA installation",
+    "contract": "InstallControls",
+    "dependencies": "React",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/notifications/preferences.ts",
+    "purpose": "Non-sensitive opt-in bit",
+    "contract": "notificationOptIn",
+    "dependencies": "localStorage",
+    "test": "Unit and E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/notifications/notification-policy.ts",
+    "purpose": "Privacy-preserving notification gate",
+    "contract": "shouldNotify",
+    "dependencies": "None",
+    "test": "Vitest",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/notifications/notification-policy.test.ts",
+    "purpose": "Negative notification privacy tests",
+    "contract": "Vitest",
+    "dependencies": "Policy module",
+    "test": "CI unit",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/notifications/NotificationSettings.tsx",
+    "purpose": "Explicit browser permission controls",
+    "contract": "NotificationSettings",
+    "dependencies": "Browser Notifications",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/notifications/usePrivateNotifications.ts",
+    "purpose": "Generic notifications for new decrypted events",
+    "contract": "usePrivateNotifications",
+    "dependencies": "Matrix SDK",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/shared/styles/stage5.css",
+    "purpose": "Responsive mobile and accessible layout",
+    "contract": "Styles",
+    "dependencies": "AppShell",
+    "test": "PWA E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/stage5-pwa-mobile.spec.ts",
+    "purpose": "Real offline, privacy, mobile, permission acceptance",
+    "contract": "Playwright",
+    "dependencies": "Chromium",
+    "test": "CI E2E",
+    "review": "2026-11-04"
   }
 ]
