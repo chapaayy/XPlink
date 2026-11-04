@@ -750,5 +750,13 @@
     "dependencies": "Chromium",
     "test": "CI E2E",
     "review": "2026-11-04"
+  },
+  {
+    "path": ".github/workflows/stage5-format.yml",
+    "purpose": "One-off Prettier and deterministic file index on Stage 5 branch",
+    "contract": "GitHub Actions",
+    "dependencies": "pnpm + Node",
+    "test": "CI quality",
+    "review": "2026-11-04"
   }
 ]
