@@ -1,7 +1,6 @@
 name: Bootstrap stage 4 dependencies and file index
 on:
-  push:
-    branches: [feat/stage-4-matrixrtc-livekit]
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
