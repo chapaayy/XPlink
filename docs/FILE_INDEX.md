@@ -98,3 +98,4 @@
 | `apps/web/src/features/notifications/usePrivateNotifications.ts` | Generic notifications for new decrypted events | usePrivateNotifications | Matrix SDK | PWA E2E | 2026-11-04 |
 | `apps/web/src/shared/styles/stage5.css` | Responsive mobile and accessible layout | Styles | AppShell | PWA E2E | 2026-11-04 |
 | `tests/e2e/stage5-pwa-mobile.spec.ts` | Real offline, privacy, mobile, permission acceptance | Playwright | Chromium | CI E2E | 2026-11-04 |
+| `.github/workflows/stage5-format.yml` | One-off Prettier and deterministic file index on Stage 5 branch | GitHub Actions | pnpm + Node | CI quality | 2026-11-04 |
