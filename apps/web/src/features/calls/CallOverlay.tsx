@@ -55,7 +55,8 @@ export function CallOverlay({ client, target, onClose, onError }: Props) {
   const intent = useMemo(() => callIntent(target), [target]);
   useEffect(() => {
     let alive = true;
-    void Promise.all([authorizeRtcCall(client, target), initialize()])
+    void authorizeRtcCall(client, target)
+      .then(() => initialize())
       .then(() => {
         if (alive) setReady(true);
       })
