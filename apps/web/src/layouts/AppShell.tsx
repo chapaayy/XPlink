@@ -1,12 +1,22 @@
 import { useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
-import { assertEncryptedRoom, listRooms } from '@xplink/matrix-adapter';
+import {
+  assertEncryptedRoom,
+  childRoomIds,
+  directRoomIds,
+  listRooms,
+  listSpaces,
+} from '@xplink/matrix-adapter';
+import type { SecretStorageAccess } from '@xplink/matrix-adapter';
 import { RoomList } from '../features/channels/RoomList';
 import { CreateRoomForm } from '../features/channels/CreateRoomForm';
+import { WorkspaceRail } from '../features/spaces/WorkspaceRail';
+import { SpaceNavigation } from '../features/spaces/SpaceNavigation';
+import { DirectChats } from '../features/directs/DirectChats';
+import { ChannelPermissions } from '../features/roles/ChannelPermissions';
 import { MessageTimeline } from '../features/messages/MessageTimeline';
 import { Composer } from '../features/messages/Composer';
 import { SecurityPanel } from '../features/security/SecurityPanel';
-import type { SecretStorageAccess } from '@xplink/matrix-adapter';
 
 interface Props {
   secretAccess: SecretStorageAccess;
@@ -17,12 +27,16 @@ interface Props {
 }
 
 export function AppShell({ client, revision, userId, onLogout, secretAccess }: Props) {
-  const [showSecurity, setShowSecurity] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [selectedSpace, setSelectedSpace] = useState<string | null>(null);
+  const [rightPanel, setRightPanel] = useState<'security' | 'roles' | null>(null);
   const [securityState, setSecurityState] = useState('');
   const rooms = listRooms(client);
-  const active = rooms.find((r) => r.id === selected && r.membership === 'join');
+  const active = rooms.find((room) => room.id === selected && room.membership === 'join');
   const encrypted = Boolean(active?.encrypted);
+  const spaces = listSpaces(client);
+  const nested = spaces.flatMap((space) => childRoomIds(client, space.id));
+  const direct = [...directRoomIds(client)];
   const selectRoom = async (id: string) => {
     setSelected(id);
     try {
@@ -34,11 +48,15 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
   };
   return (
     <div className="app-layout">
-      <aside className="workspace-rail" aria-label="Пространства">
-        <div className="brand-logo compact">XP</div>
-        <div className="rail-divider" />
-        <div className="rail-pill">#</div>
-      </aside>
+      <WorkspaceRail
+        client={client}
+        activeSpace={selectedSpace}
+        revision={revision}
+        onSelect={(id) => {
+          setSelectedSpace(id);
+          setSelected(null);
+        }}
+      />
       <aside className="sidebar">
         <header className="sidebar-header">
           <div>
@@ -48,19 +66,38 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
           <span className="online-dot" title="Подключено" />
         </header>
         <div className="sidebar-scroll">
-          <p className="section-label">Каналы</p>
-          <RoomList
-            client={client}
-            selectedRoomId={selected}
-            onSelect={(id) => void selectRoom(id)}
-            revision={revision}
-          />
-          <CreateRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
+          {selectedSpace ? (
+            <SpaceNavigation
+              client={client}
+              spaceId={selectedSpace}
+              selectedRoomId={selected}
+              onSelect={(id) => void selectRoom(id)}
+              revision={revision}
+            />
+          ) : (
+            <>
+              <p className="section-label">Каналы</p>
+              <RoomList
+                client={client}
+                selectedRoomId={selected}
+                onSelect={(id) => void selectRoom(id)}
+                revision={revision}
+                hideRoomIds={[...nested, ...direct]}
+              />
+              <CreateRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
+              <DirectChats
+                client={client}
+                selectedRoomId={selected}
+                onSelect={(id) => void selectRoom(id)}
+                revision={revision}
+              />
+            </>
+          )}
         </div>
         <button
           className="security-toggle"
-          onClick={() => setShowSecurity((value) => !value)}
-          aria-expanded={showSecurity}
+          onClick={() => setRightPanel((value) => (value === 'security' ? null : 'security'))}
+          aria-expanded={rightPanel === 'security'}
         >
           🔐 Безопасность и устройства
         </button>
@@ -83,7 +120,13 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
                 <strong># {active.name}</strong>
                 <small>🔒 E2EE Matrix / Rust Crypto</small>
               </div>
-              <span className="header-note">Только тестовый этап</span>
+              <button
+                className="chat-permissions"
+                disabled={!encrypted}
+                onClick={() => setRightPanel((value) => (value === 'roles' ? null : 'roles'))}
+              >
+                Участники и права
+              </button>
             </header>
             {securityState && (
               <div className="security-alert" role="alert">
@@ -97,7 +140,7 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
               </>
             ) : (
               <div className="center-notice">
-                Эта комната не зашифрована. Просмотр и отправка заблокированы.
+                Комната не зашифрована. Отправка и просмотр заблокированы.
               </div>
             )}
           </>
@@ -106,25 +149,28 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
             <div className="empty-icon">🔐</div>
             <h2>Защищённая переписка начинается здесь</h2>
             <p>
-              Создайте зашифрованный канал и пригласите второго участника по Matrix ID. У второго
-              пользователя появится приглашение.
+              Создайте E2EE-канал, пространство или личный чат. Содержимое сообщений доступно только
+              устройствам с ключами.
             </p>
-            <p className="muted">Сохраните recovery key и проверяйте новые устройства.</p>
-            <p className="muted">До публичного запуска требуется аудит безопасности.</p>
+            <p className="muted">
+              Сохраните recovery key. Для публичного запуска требуется аудит безопасности.
+            </p>
           </div>
         )}
       </main>
-      <aside
-        className={showSecurity ? 'security-panel' : 'security-panel security-panel-hidden'}
-        aria-label="Безопасность"
-      >
-        <SecurityPanel
-          client={client}
-          secretAccess={secretAccess}
-          roomId={active?.id ?? null}
-          revision={revision}
-        />
-      </aside>
+      {rightPanel === 'security' && (
+        <aside className="security-panel" aria-label="Безопасность">
+          <SecurityPanel
+            client={client}
+            secretAccess={secretAccess}
+            roomId={active?.id ?? null}
+            revision={revision}
+          />
+        </aside>
+      )}
+      {rightPanel === 'roles' && encrypted && active && (
+        <ChannelPermissions client={client} roomId={active.id} revision={revision} />
+      )}
     </div>
   );
 }

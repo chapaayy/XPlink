@@ -1,0 +1,41 @@
+name: Bootstrap Stage 3 locked dependencies and format
+on:
+  push:
+    branches: [feat/stage-3-text-product]
+    paths: [.github/workflows/stage3-bootstrap.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage3-bootstrap
+  cancel-in-progress: false
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/stage-3-text-product
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install and update lockfile using trusted CI registry
+        run: pnpm install --no-frozen-lockfile
+      - name: Apply repository formatting and regenerate index
+        run: |
+          pnpm exec prettier --write .
+          pnpm docs:generate
+      - name: Commit locked and formatted implementation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(stage-3): lock Matrix attachment dependency and format implementation'
+            git push origin feat/stage-3-text-product
+          fi

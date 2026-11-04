@@ -18,3 +18,33 @@ export { roomIdentities, assertStableRoomIdentities, removeRoomMember } from './
 export type { PeerIdentity } from './identity';
 export { VerificationFlow, requestOwnVerification, requestPeerVerification } from './verification';
 export type { SasDisplay } from './verification';
+
+export {
+  createSpace,
+  createCategory,
+  createSpaceChannel,
+  listSpaces,
+  childRoomIds,
+  isSpace,
+  inviteToSpace,
+} from './spaces';
+export type { SpaceSummary } from './spaces';
+export { createDirectChat, directRoomMap, directRoomIds, markIncomingDirect } from './directs';
+export {
+  roomPowerLevels,
+  userLevel,
+  isRoomCreator,
+  canWrite,
+  isReadOnly,
+  assignChannelRole,
+  setChannelReadOnly,
+} from './roles';
+export type { ChannelRole } from './roles';
+export { addReaction } from './reactions';
+export {
+  sendEncryptedAttachment,
+  downloadEncryptedAttachment,
+  MAX_ATTACHMENT_BYTES,
+} from './attachments';
+export type { ChatAttachment, AttachmentRef } from './attachments';
+export type { ReactionSummary } from './timeline';

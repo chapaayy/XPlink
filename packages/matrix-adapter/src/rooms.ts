@@ -1,5 +1,6 @@
 import type { MatrixClient } from 'matrix-js-sdk';
 import { Preset, Visibility } from 'matrix-js-sdk';
+import { markIncomingDirect } from './directs';
 
 export interface RoomSummary {
   id: string;
@@ -47,5 +48,6 @@ export async function createEncryptedRoom(
 export async function acceptRoomInvite(client: MatrixClient, roomId: string): Promise<void> {
   const room = client.getRoom(roomId);
   if (!room || room.getMyMembership() !== 'invite') throw new Error('Приглашение не найдено.');
+  await markIncomingDirect(client, roomId);
   await client.joinRoom(roomId);
 }

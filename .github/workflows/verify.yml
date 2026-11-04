@@ -1,4 +1,4 @@
-name: Verify XPlink stages 1 and 2
+name: Verify XPlink stages 1, 2 and 3
 on:
   pull_request:
   workflow_dispatch:
@@ -20,9 +20,13 @@ jobs:
       - run: pnpm docs:check
       - run: pnpm format:check
       - run: pnpm lint
+        if: always()
       - run: pnpm typecheck
+        if: always()
       - run: pnpm test
+        if: always()
       - run: pnpm build
+        if: always()
   e2ee:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -47,12 +51,12 @@ jobs:
           done
           docker compose --env-file .env -f deploy/compose.dev.yml logs --tail=80
           exit 1
-      - name: Create two closed-registration test accounts
+      - name: Provision isolated closed-registration CI accounts
         run: |
           password="$(openssl rand -hex 24)"
           echo "::add-mask::$password"
           echo "XPLINK_TEST_PASSWORD=$password" >> "$GITHUB_ENV"
-          for username in alice bob carol alicesas bobsas alicemember bobmember alicetab; do
+          for username in alice bob carol alicesas bobsas alicemember bobmember alicetab alicedm bobdm alicework bobwork; do
             docker compose --env-file .env -f deploy/compose.dev.yml exec -T synapse \
               register_new_matrix_user -c /data/homeserver.yaml \
               -u "$username" -p "$password" --no-admin http://localhost:8008

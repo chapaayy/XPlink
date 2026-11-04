@@ -23,3 +23,15 @@ E2E: `tests/e2e/recovery-devices.spec.ts` использует два незав
 **CI ratelimit policy:** Synapse normally limits `rc_login.address` to a burst of 5 requests per IP; several independent browser cases run behind the same local Caddy address. Dev-only generated config raises the IP burst to 30 while retaining normal per-account and failed-attempt limits. Production must have a separate, strict policy.
 
 **Фактическая приёмка:** [GitHub Actions #41722622079](https://github.com/chapaayy/XPlink/actions/runs/41722622079), успешно 5/5 E2E, quality и restart persistence. Серверный отказ при чтении будущего события исключённым участником допускает HTTP 403 или 404 (скрытие существования приватного события), но не HTTP 200. Реальный CI не заменяет независимый аудит.
+
+## Stage 3 — реальные проверки текстового продукта
+
+- Unit `stage3.test.ts`: отсутствие Rust Crypto блокирует создание Space, некорректный размер файла блокирует upload, подмена URL не приводит к загрузке, попытка правки power levels не маскирует отказ сервера, E2EE gate запрещает реакцию без crypto.
+- Playwright `stage3-dm-media.spec.ts`: личный E2EE чат в двух Chromium контекстах, зашифрованный текст/реакция, загрузка бинарного ciphertext, скачивание/дешифровка на устройстве получателя; ciphertext не содержит тестовый plaintext.
+- Playwright `stage3-spaces-roles.spec.ts`: создание приватного Workspace, вложенной категории и E2EE-канала, приглашение второго пользователя, read-only power levels, HTTP 403 при прямом запросе записи `m.room.power_levels` без прав, повышение до moderator 50 и разрешённая зашифрованная отправка.
+- Полный прогон объединяет регрессии этапов 1–2, `pnpm docs:check`, Prettier, ESLint, TS strict, Vitest, Vite production build, Docker restart persistence. Все тестовые аккаунты изолированы.
+- Эти тесты проверяют конкретные сценарии, **но не** заменяют независимый security review, security testing of arbitrary file formats, DoS/large media и продакшен backup/restore.
+
+## Этап 3 — результат приёмки
+
+[GitHub Actions #41846507062](https://github.com/chapaayy/XPlink/actions/runs/41846507062) — 7/7 E2E прошли. В `stage3-spaces-roles.spec.ts` дополнительно проверена прямая HTTP-попытка отправить `m.room.encrypted` без необходимого power level: Synapse возвращает 403 `M_FORBIDDEN`; это не ограничение интерфейса. В `stage3-dm-media.spec.ts` проверены DM, реакции, ciphertext на сервере и восстановление файлового содержимого только на клиенте. После перезапуска PostgreSQL/Synapse сохранились 8 комнат. Проверки не заменяют аудит, отдельные права каждого пространства не наследуются в каналы.

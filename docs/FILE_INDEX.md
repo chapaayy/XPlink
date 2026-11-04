@@ -54,3 +54,18 @@
 | `tests/e2e/sas-verification.spec.ts` | Two independent Matrix devices complete human-confirmed SAS verification | Playwright E2E | Synapse + Rust Crypto + browser | CI e2ee | 2026-11-04 |
 | `tests/e2e/member-revocation.spec.ts` | Verify server forbids post-kick ciphertext access to removed members | Playwright E2E | Matrix SDK + Synapse + Chromium | CI e2ee | 2026-11-04 |
 | `tests/e2e/tab-ownership.spec.ts` | Ensure only one browser tab owns the Rust Crypto IndexedDB store | Playwright E2E | Matrix SDK + Synapse + Chromium | CI e2ee | 2026-11-04 |
+| `.github/workflows/stage3-bootstrap.yml` | One-time lockfile, prettier and FILE_INDEX bootstrap on stage-3 branch | GitHub Actions | pnpm 10, Node 22 | CI bootstrap | 2026-11-04 |
+| `packages/matrix-adapter/src/spaces.ts` | Native Matrix m.space hierarchy and E2EE channel linking | createSpace/createCategory/createSpaceChannel/listSpaces | Matrix state/membership | E2E workspace | 2026-11-04 |
+| `packages/matrix-adapter/src/directs.ts` | Encrypted one-to-one chats and native m.direct account mapping | createDirectChat/markIncomingDirect | Matrix account_data | E2E DM | 2026-11-04 |
+| `packages/matrix-adapter/src/roles.ts` | Server-authoritative channel roles and readonly permissions | assignChannelRole/setChannelReadOnly | Matrix power levels | E2E server 403 | 2026-11-04 |
+| `packages/matrix-adapter/src/reactions.ts` | Encrypted Matrix m.reaction event sending | addReaction | Matrix SDK encrypted timeline | E2E reactions | 2026-11-04 |
+| `packages/matrix-adapter/src/attachments.ts` | Encrypted media upload/download with hash verification and no plaintext fallback | sendEncryptedAttachment/downloadEncryptedAttachment | matrix-encrypt-attachment | E2E media | 2026-11-04 |
+| `packages/matrix-adapter/src/stage3.test.ts` | Negative authorization, media and E2EE tests | Vitest tests | adapter + Vitest | unit tests | 2026-11-04 |
+| `apps/web/src/features/spaces/WorkspaceRail.tsx` | Workspace switcher and new space action | WorkspaceRail | React + spaces adapter | E2E space | 2026-11-04 |
+| `apps/web/src/features/spaces/SpaceNavigation.tsx` | Workspace category/channel tree and membership controls | SpaceNavigation | React + spaces adapter | E2E hierarchy | 2026-11-04 |
+| `apps/web/src/features/directs/DirectChats.tsx` | One-to-one E2EE chat creation and navigation | DirectChats | React + direct adapter | E2E DM | 2026-11-04 |
+| `apps/web/src/features/roles/ChannelPermissions.tsx` | Power levels and server-enforced role settings UI | ChannelPermissions | React + roles adapter | E2E 403 | 2026-11-04 |
+| `apps/web/src/shared/styles/stage3.css` | Workspace, role and attachment layout styles | CSS presentation | global.css + React UI | visual review | 2026-11-04 |
+| `tests/e2e/stage3-dm-media.spec.ts` | Real encrypted DM, reaction, binary media upload and download | Playwright E2E | Synapse + Chromium | CI E2E | 2026-11-04 |
+| `tests/e2e/stage3-spaces-roles.spec.ts` | Workspace category linking and Synapse power-level rejection | Playwright E2E | Synapse + Chromium | CI E2E | 2026-11-04 |
+| `docs/adr/0006-matrix-spaces-roles-media.md` | Protocol and safety decisions for Matrix text-product model | ADR | Matrix specification | review | 2026-11-04 |
