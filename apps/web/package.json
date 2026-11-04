@@ -14,7 +14,7 @@
     "react-dom": "19.3.1",
     "matrix-js-sdk": "45.0.0",
     "@element-hq/element-call-component": "0.28.1",
-    "@vector-im/compound-web": "10.3.1",
+    "@vector-im/compound-web": "10.4.0",
     "@vector-im/compound-design-tokens": "11.3.1",
     "@xplink/rtc-adapter": "workspace:*"
   },
