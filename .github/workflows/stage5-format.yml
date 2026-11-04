@@ -1,7 +1,5 @@
 name: Format XPlink stage 5
 on:
-  push:
-    branches: [feat/stage-5-ux-pwa-notifications]
   workflow_dispatch:
 permissions:
   contents: write
