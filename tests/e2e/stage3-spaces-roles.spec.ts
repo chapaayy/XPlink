@@ -95,6 +95,28 @@ test('space categories link E2EE channels and Synapse enforces readonly/role per
     );
     expect(unauthorized.status()).toBe(403);
 
+    // A compromised or modified web client must not bypass channel readonly.
+    // Check Synapse's actual encrypted wire-event authorization, not only UI state.
+    const blockedMessage = await request.put(
+      '/_matrix/client/v3/rooms/' +
+        encodeURIComponent(roomId) +
+        '/send/m.room.encrypted/' +
+        encodeURIComponent('readonly-negative-' + Date.now()),
+      {
+        headers: { Authorization: 'Bearer ' + bobToken },
+        data: {
+          algorithm: 'm.megolm.v1.aes-sha2',
+          sender_key: 'invalid-test-key',
+          ciphertext: 'invalid-test-ciphertext',
+          session_id: 'invalid-test-session',
+          device_id: 'negative-test',
+        },
+      },
+    );
+    expect(blockedMessage.status()).toBe(403);
+    const blockedBody = (await blockedMessage.json()) as { errcode?: string };
+    expect(blockedBody.errcode).toBe('M_FORBIDDEN');
+
     const select = alice.getByLabel('Роль @bobwork:localhost');
     await expect(select).toBeVisible({ timeout: 20_000 });
     await select.selectOption('moderator');
