@@ -16,6 +16,10 @@ import { DirectChats } from '../features/directs/DirectChats';
 import { ChannelPermissions } from '../features/roles/ChannelPermissions';
 import { MessageTimeline } from '../features/messages/MessageTimeline';
 import { Composer } from '../features/messages/Composer';
+import { CallOverlay } from '../features/calls/CallOverlay';
+import { CreateVoiceRoomForm } from '../features/calls/CreateVoiceRoomForm';
+import type { CallTarget } from '@xplink/rtc-adapter';
+import { directRoomIds as listDirectRooms } from '@xplink/matrix-adapter';
 import { SecurityPanel } from '../features/security/SecurityPanel';
 
 interface Props {
@@ -31,12 +35,24 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
   const [selectedSpace, setSelectedSpace] = useState<string | null>(null);
   const [rightPanel, setRightPanel] = useState<'security' | 'roles' | null>(null);
   const [securityState, setSecurityState] = useState('');
+  const [activeCall, setActiveCall] = useState<CallTarget | null>(null);
+  const [callError, setCallError] = useState('');
   const rooms = listRooms(client);
   const active = rooms.find((room) => room.id === selected && room.membership === 'join');
   const encrypted = Boolean(active?.encrypted);
   const spaces = listSpaces(client);
   const nested = spaces.flatMap((space) => childRoomIds(client, space.id));
   const direct = [...directRoomIds(client)];
+  const callInRoom = (kind: 'voice' | 'video', intent: 'start' | 'join' = 'start') => {
+    if (!active || !active.encrypted) return;
+    setCallError('');
+    setActiveCall({
+      roomId: active.id,
+      kind,
+      intent,
+      direct: listDirectRooms(client).has(active.id),
+    });
+  };
   const selectRoom = async (id: string) => {
     setSelected(id);
     try {
@@ -85,6 +101,7 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
                 hideRoomIds={[...nested, ...direct]}
               />
               <CreateRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
+              <CreateVoiceRoomForm client={client} onCreated={(id) => void selectRoom(id)} />
               <DirectChats
                 client={client}
                 selectedRoomId={selected}
@@ -120,6 +137,22 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
                 <strong># {active.name}</strong>
                 <small>🔒 E2EE Matrix / Rust Crypto</small>
               </div>
+              <div className="call-header-controls">
+                <button
+                  onClick={() => callInRoom('voice')}
+                  disabled={!encrypted}
+                  aria-label="Начать голосовой звонок"
+                >
+                  ☎ Голос
+                </button>
+                <button
+                  onClick={() => callInRoom('video')}
+                  disabled={!encrypted}
+                  aria-label="Начать видеозвонок"
+                >
+                  ▣ Видео
+                </button>
+              </div>
               <button
                 className="chat-permissions"
                 disabled={!encrypted}
@@ -128,6 +161,11 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
                 Участники и права
               </button>
             </header>
+            {callError && (
+              <div className="security-alert" role="alert">
+                {callError}
+              </div>
+            )}
             {securityState && (
               <div className="security-alert" role="alert">
                 {securityState}
@@ -158,6 +196,15 @@ export function AppShell({ client, revision, userId, onLogout, secretAccess }: P
           </div>
         )}
       </main>
+      {activeCall && (
+        <CallOverlay
+          key={activeCall.roomId + activeCall.kind}
+          client={client}
+          target={activeCall}
+          onError={(message) => setCallError(message)}
+          onClose={() => setActiveCall(null)}
+        />
+      )}
       {rightPanel === 'security' && (
         <aside className="security-panel" aria-label="Безопасность">
           <SecurityPanel

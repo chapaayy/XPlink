@@ -1,6 +1,7 @@
 import type { MatrixClient, Room } from 'matrix-js-sdk';
 import { EventType, Preset, Visibility } from 'matrix-js-sdk';
 import { createEncryptedRoom } from './rooms';
+import { createVoiceRoom } from './voice';
 
 export interface SpaceSummary {
   id: string;
@@ -81,8 +82,11 @@ export async function createSpaceChannel(
   parentId: string,
   name: string,
   invitee = '',
+  voice = false,
 ): Promise<string> {
-  const id = await createEncryptedRoom(client, name, invitee);
+  const id = voice
+    ? await createVoiceRoom(client, name, invitee)
+    : await createEncryptedRoom(client, name, invitee);
   await linkChild(client, parentId, id);
   return id;
 }

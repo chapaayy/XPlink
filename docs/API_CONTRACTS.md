@@ -11,3 +11,7 @@
 - `attachments.ts`: `sendEncryptedAttachment`, `downloadEncryptedAttachment`, `MAX_ATTACHMENT_BYTES`. Вызов без E2EE отклоняется **до любого media upload**. Расшифровка требует корректного `mxc://`, SHA-256, encryption info и действующей Matrix-сессии.
 
 Никакого собственного backend API и внешних сервисов расшифровки.
+
+## Этап 4
+
+`@xplink/rtc-adapter` экспортирует `authorizeRtcCall`, `discoverRtcTransport` и тип `CallTarget`. Через HTTP XPlink обращается **только** к родному клиентскому MatrixRTC транспорту Synapse; JWT создаёт сервис авторизации, а не React-код. Никаких прямых запросов с приватным LiveKit API key из браузера. Встроенный Element Call использует существующий MatrixClient, его E2EE identity и RTC подписку.

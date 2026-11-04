@@ -30,3 +30,18 @@ UI получает от `matrix-adapter` только примитивы и т�
 Слой `matrix-adapter` изолирует SDK и медиакриптографию (`matrix-encrypt-attachment@1.0.3`); React компоненты занимаются только состоянием интерфейса. Media bytes шифруются локально перед запросом `/upload`; ключ и IV прикрепляются лишь к Megolm-зашифрованному сообщению, которое доставляет SDK. При скачивании используется авторизованный Matrix media endpoint, проверяется SHA-256 и затем дешифруется только локально. Никаких plaintext `mxc` ссылок.
 
 Права доступа — `m.room.power_levels` и членство Matrix; роль «модератор» соответствует power 50, «администратор» — 100. Spaces не дают автоматического наследования этих прав в дочерние комнаты. Подробности — `docs/PERMISSIONS.md` и ADR 0006.
+
+## Этап 4 — MatrixRTC и LiveKit
+
+```text
+XPlink React (единственный MatrixClient, Rust Crypto)
+    -> packages/rtc-adapter (E2EE room & membership checks + transport lookup)
+    -> Element Call component 0.28.1 (experimental official React embedding)
+         -> MatrixRTC membership and per-sender E2EE keys: Synapse
+         -> LiveKit JWT via Synapse appservice MSC4502/MSC4512 (membership check)
+         -> LiveKit SFU (forward encrypted WebRTC audio/video/screenshare)
+```
+
+Новые процессы в локальном Docker: `lk-jwt-service`, `livekit`, существующие Synapse/Caddy. Ключи SFU генерируются локально с mode 0600, JWT выдаётся авторизованному пользователю. `room.auto_create: false` на SFU; `LIVEKIT_FULL_ACCESS_HOMESERVERS=localhost` вместо wildcard. Медиа не проходит через собственный сервер XPlink, клиент использует официальный upstream SDK. В браузере только один MatrixClient с Rust Crypto. Для developer loopback используются HTTP/WS; это **не публичная конфигурация**.
+
+**Решение по встроенному компоненту:** ADR-0003 фиксирует выбор официального Element Call React component вместо самописного widget driver. Его API является экспериментальным и AGPL-3.0; компонент допускает замену на widget через границу rtc-adapter. Нельзя утверждать E2EE без реальной многопользовательской проверки.

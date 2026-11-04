@@ -46,6 +46,24 @@ federation_domain_whitelist: []
 url_preview_enabled: false
 media_store_path: /data/media_store
 max_upload_size: 10M
+app_service_config_files:
+  - /data/rtc-appservice.yaml
+experimental_features:
+  msc4143_enabled: true
+  msc4502_enabled: true
+  msc4512_enabled: true
+max_event_delay_duration: 24h
+rc_message:
+  per_second: 0.5
+  burst_count: 30
+rc_delayed_event_mgmt:
+  per_second: 1
+  burst_count: 20
+matrix_rtc:
+  transports:
+    - type: livekit
+      url: ws://xplink.localhost:8080/livekit/sfu
+      livekit_service_url: http://localhost:8080/livekit/jwt
 listeners:
   - port: 8008
     bind_addresses: ['0.0.0.0']
@@ -53,7 +71,7 @@ listeners:
     type: http
     x_forwarded: true
     resources:
-      - names: [client]
+      - names: [client, federation]
         compress: false
 database:
   name: psycopg2

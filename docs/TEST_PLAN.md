@@ -35,3 +35,10 @@ E2E: `tests/e2e/recovery-devices.spec.ts` использует два незав
 ## Этап 3 — результат приёмки
 
 [GitHub Actions #41846507062](https://github.com/chapaayy/XPlink/actions/runs/41846507062) — 7/7 E2E прошли. В `stage3-spaces-roles.spec.ts` дополнительно проверена прямая HTTP-попытка отправить `m.room.encrypted` без необходимого power level: Synapse возвращает 403 `M_FORBIDDEN`; это не ограничение интерфейса. В `stage3-dm-media.spec.ts` проверены DM, реакции, ciphertext на сервере и восстановление файлового содержимого только на клиенте. После перезапуска PostgreSQL/Synapse сохранились 8 комнат. Проверки не заменяют аудит, отдельные права каждого пространства не наследуются в каналы.
+
+## Этап 4 — MatrixRTC / LiveKit / Element Call
+
+- Unit `packages/rtc-adapter/src/call-session.test.ts`: запрещён незашифрованный звонок, подмена источника транспорта и отсутствие membership/ключей.
+- E2E `tests/e2e/stage4-matrixrtc.spec.ts`: три независимых клиента получают доступ к одной E2EE-голосовой комнате, Synapse сообщает транспорт, JWT service отказывает в неавторизованном доступе, все три клиента запускают официальный Element Call и закрывают его.
+- Для полной приёмки: реальная передача аудио/видео между 3 участниками, микрофон mute/unmute, демонстрация экрана, leave/rejoin, отказ неучастнику в JWT, подтверждение E2EE встроенным MatrixRTC, отсутствие plaintext у SFU. До успешных проверок **не отмечать этап как принятый**.
+- `healthcheck.sh` проверяет не только web и Synapse, но также LiveKit и JWT. `init-rtc.sh` не должен менять существующие Synapse signing keys, пользователя и recovery ключи.

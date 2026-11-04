@@ -6,5 +6,5 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   reporter: 'list',
-  use: { baseURL: 'http://localhost:8080', headless: true, browserName: 'chromium' },
+  use: { baseURL: 'http://localhost:8080', headless: true, browserName: 'chromium', launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] } },
 });

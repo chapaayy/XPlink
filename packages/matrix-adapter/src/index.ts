@@ -48,3 +48,5 @@ export {
 } from './attachments';
 export type { ChatAttachment, AttachmentRef } from './attachments';
 export type { ReactionSummary } from './timeline';
+
+export { createVoiceRoom, isVoiceRoom, VOICE_ROOM_STATE } from './voice';

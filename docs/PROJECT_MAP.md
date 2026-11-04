@@ -37,3 +37,14 @@
 | Зашифрованные файлы                        | `attachments.ts`, `Composer.tsx`, `MessageTimeline.tsx`         | Encrypted upload + SHA-256             |
 | Компоновка UI                              | `apps/web/src/layouts/AppShell.tsx`, `shared/styles/stage3.css` | Не создавать второй MatrixClient       |
 | E2E приёмка                                | `tests/e2e/stage3-*.spec.ts`, `.github/workflows/verify.yml`    | Настоящий Synapse + Chromium           |
+
+## Этап 4 — RTC
+
+| Задача                           | Модуль                                                                            | Граница                                                         |
+| -------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Авторизация RTC                  | `packages/rtc-adapter/src/call-session.ts`                                        | Только после Matrix E2EE и membership                           |
+| Проверка транспорта              | `packages/rtc-adapter/src/transport.ts`                                           | Сервер должен объявить LiveKit; никакого стороннего fallback    |
+| Звук, видео, демонстрация экрана | `apps/web/src/features/calls/CallOverlay.tsx`                                     | Официальный Element Call; не дублировать MediaStream/шифрование |
+| Голосовые комнаты                | `packages/matrix-adapter/src/voice.ts`, `CreateVoiceRoomForm.tsx`                 | Только приватный E2EE room state                                |
+| SFU и JWT сервис                 | `deploy/compose.dev.yml`, `services/synapse/enable_rtc.py`, `scripts/init-rtc.sh` | Секреты не попадут в Git; no auto-create                        |
+| RTC CI                           | `tests/e2e/stage4-matrixrtc.spec.ts`                                              | Реальные браузеры и Synapse                                     |

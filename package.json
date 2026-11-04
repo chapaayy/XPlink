@@ -11,10 +11,10 @@
     "dev": "pnpm --filter @xplink/web dev",
     "build": "pnpm --filter @xplink/web build",
     "typecheck": "pnpm -r typecheck",
-    "lint": "eslint apps/web/src packages/matrix-adapter/src",
+    "lint": "eslint apps/web/src packages/matrix-adapter/src packages/rtc-adapter/src",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run packages/matrix-adapter/src && node --test scripts/*.test.mjs",
+    "test": "vitest run packages/matrix-adapter/src packages/rtc-adapter/src && node --test scripts/*.test.mjs",
     "test:e2e": "playwright test",
     "docs:generate": "node scripts/generate-file-index.mjs",
     "docs:check": "node scripts/generate-file-index.mjs --check && node scripts/verify-repo-map.mjs"

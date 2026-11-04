@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function SpaceNavigation({ client, spaceId, selectedRoomId, onSelect, revision }: Props) {
-  const [kind, setKind] = useState<'channel' | 'category'>('channel');
+  const [kind, setKind] = useState<'channel' | 'voice' | 'category'>('channel');
   const [parent, setParent] = useState('');
   const [name, setName] = useState('');
   const [invite, setInvite] = useState('');
@@ -67,12 +67,14 @@ export function SpaceNavigation({ client, spaceId, selectedRoomId, onSelect, rev
           const action =
             kind === 'category'
               ? createCategory(client, spaceId, name)
-              : createSpaceChannel(client, parent || spaceId, name, invite);
+              : kind === 'voice'
+                ? createSpaceChannel(client, parent || spaceId, name, invite, true)
+                : createSpaceChannel(client, parent || spaceId, name, invite);
           void action
             .then((id) => {
               setName('');
               setInvite('');
-              if (kind === 'channel') onSelect(id);
+              if (kind !== 'category') onSelect(id);
             })
             .catch((error: unknown) => {
               const code = (error as { errcode?: unknown })?.errcode;
@@ -97,12 +99,13 @@ export function SpaceNavigation({ client, spaceId, selectedRoomId, onSelect, rev
         <select
           aria-label="Тип элемента"
           value={kind}
-          onChange={(event) => setKind(event.target.value as 'channel' | 'category')}
+          onChange={(event) => setKind(event.target.value as 'channel' | 'voice' | 'category')}
         >
           <option value="channel">Защищённый канал</option>
+          <option value="voice">Голосовой канал</option>
           <option value="category">Категория</option>
         </select>
-        {kind === 'channel' && (
+        {kind !== 'category' && (
           <select
             aria-label="Категория канала"
             value={parent}
@@ -118,7 +121,7 @@ export function SpaceNavigation({ client, spaceId, selectedRoomId, onSelect, rev
         )}
         <input
           id="space-new-name"
-          placeholder={kind === 'channel' ? 'Название канала' : 'Название категории'}
+          placeholder={kind === 'category' ? 'Название категории' : kind === 'voice' ? 'Название голосового канала' : 'Название канала'}
           value={name}
           onChange={(event) => setName(event.target.value)}
           required

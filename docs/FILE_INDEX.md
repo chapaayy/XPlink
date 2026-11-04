@@ -69,3 +69,17 @@
 | `tests/e2e/stage3-dm-media.spec.ts` | Real encrypted DM, reaction, binary media upload and download | Playwright E2E | Synapse + Chromium | CI E2E | 2026-11-04 |
 | `tests/e2e/stage3-spaces-roles.spec.ts` | Workspace category linking and Synapse power-level rejection | Playwright E2E | Synapse + Chromium | CI E2E | 2026-11-04 |
 | `docs/adr/0006-matrix-spaces-roles-media.md` | Protocol and safety decisions for Matrix text-product model | ADR | Matrix specification | review | 2026-11-04 |
+| `packages/rtc-adapter/package.json` | Independent MatrixRTC adapter workspace | pnpm package | matrix-js-sdk, Rust Crypto adapter | CI pnpm typecheck | 2026-11-04 |
+| `packages/rtc-adapter/tsconfig.json` | Strongly typed RTC adapter config | TypeScript project | tsconfig.base.json | CI typecheck | 2026-11-04 |
+| `packages/rtc-adapter/src/transport.ts` | Authenticated homeserver RTC transport lookup and trusted URL gate | discoverRtcTransport/isTrustedRtcUrl | Matrix client API | RTC unit+integration | 2026-11-04 |
+| `packages/rtc-adapter/src/call-session.ts` | Fail-closed call authorization prior to media startup | authorizeRtcCall | Matrix E2EE+transport | RTC unit+E2E | 2026-11-04 |
+| `packages/rtc-adapter/src/index.ts` | Single RTC adapter entrypoint | RTC exports | RTC implementation | CI types | 2026-11-04 |
+| `packages/rtc-adapter/src/call-session.test.ts` | RTC missing encryption and unsafe transport negative tests | Vitest tests | Vitest | CI unit | 2026-11-04 |
+| `packages/matrix-adapter/src/voice.ts` | E2EE voice channel marker and creation | createVoiceRoom/isVoiceRoom | Matrix rooms | E2E | 2026-11-04 |
+| `apps/web/src/features/calls/CallOverlay.tsx` | Lazy official Element Call, call lifecycle, device and screen-share UI | CallOverlay | RTC adapter + Element Call | RTC E2E | 2026-11-04 |
+| `apps/web/src/features/calls/CreateVoiceRoomForm.tsx` | Private encrypted voice room form | CreateVoiceRoomForm | Matrix adapter | RTC E2E | 2026-11-04 |
+| `apps/web/src/shared/styles/stage4.css` | Isolation of call layout and controls | RTC styles | Vite CSS | CI build | 2026-11-04 |
+| `scripts/init-rtc.sh` | Idempotent private RTC provisioning in Synapse container | bash script | Docker+Synapse | Docker E2E | 2026-11-04 |
+| `services/synapse/enable_rtc.py` | Secret management and homeserver config migration | python CLI | PyYAML, appservice | Docker E2E | 2026-11-04 |
+| `tests/e2e/stage4-matrixrtc.spec.ts` | Three-browser MatrixRTC authorization and secure call UI smoke | Playwright E2E | LiveKit, JWT, Synapse | CI RTC E2E | 2026-11-04 |
+| `.github/workflows/bootstrap-stage4.yml` | Resolve pinned RTC packages, format and lock on feature branch | GHA workflow | pnpm | CI quality | 2026-11-04 |

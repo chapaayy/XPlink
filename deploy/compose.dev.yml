@@ -41,6 +41,41 @@ services:
       start_period: 20s
     networks: [internal]
 
+  # RTC media is forwarded by LiveKit; Matrix appservice controls JWT issuance.
+  livekit:
+    image: livekit/livekit-server:v1.13.10
+    restart: unless-stopped
+    command: ['--config', '/etc/livekit.yaml']
+    volumes:
+      - ../.local/rtc/livekit.yaml:/etc/livekit.yaml:ro
+    ports:
+      - '127.0.0.1:7881:7881/tcp'
+      - '127.0.0.1:7882-7902:7882-7902/udp'
+    networks: [internal]
+
+  lk-jwt:
+    image: ghcr.io/element-hq/lk-jwt-service:0.9.0
+    user: '991:991'
+    restart: unless-stopped
+    environment:
+      LIVEKIT_URL: ws://xplink.localhost:8080/livekit/sfu
+      LIVEKIT_KEY: xplinkrtc
+      LIVEKIT_SECRET_FROM_FILE: /run/rtc/secret
+      LIVEKIT_FULL_ACCESS_HOMESERVERS: localhost
+      LIVEKIT_AS_REGISTRATION_FILE: /run/synapse/rtc-appservice.yaml
+      LIVEKIT_HS_SERVER_NAME: localhost
+      LIVEKIT_CS_API_URL_OVERRIDES: localhost=http://synapse:8008
+      LIVEKIT_JWT_BIND: ':8080'
+    volumes:
+      - ../.local/rtc/secret:/run/rtc/secret:ro
+      - ../.local/synapse/rtc-appservice.yaml:/run/synapse/rtc-appservice.yaml:ro
+    depends_on:
+      synapse:
+        condition: service_healthy
+      livekit:
+        condition: service_started
+    networks: [internal]
+
   web:
     build:
       context: ..
@@ -61,7 +96,10 @@ services:
     depends_on:
       - web
       - synapse
-    networks: [internal]
+    networks:
+      internal:
+        aliases:
+          - xplink.localhost
 
 volumes:
   postgres-data:

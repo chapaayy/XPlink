@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { MatrixClient } from 'matrix-js-sdk';
-import { acceptRoomInvite, listRooms } from '@xplink/matrix-adapter';
+import { acceptRoomInvite, listRooms, isVoiceRoom } from '@xplink/matrix-adapter';
 
 interface Props {
   client: MatrixClient;
@@ -57,7 +57,7 @@ export function RoomList({
                 className={room.id === selectedRoomId ? 'room-link selected' : 'room-link'}
                 onClick={() => onSelect(room.id)}
               >
-                <span>{room.encrypted ? '🔒' : '⚠️'}</span>
+                <span>{isVoiceRoom(client, room.id) ? '🔊' : room.encrypted ? '🔒' : '⚠️'}</span>
                 <span>{room.name}</span>
               </button>
             )}
