@@ -56,7 +56,7 @@ jobs:
           password="$(openssl rand -hex 24)"
           echo "::add-mask::$password"
           echo "XPLINK_TEST_PASSWORD=$password" >> "$GITHUB_ENV"
-          for username in alice bob carol alicesas bobsas alicemember bobmember alicetab alicedm bobdm alicework bobwork alicertc bobrtc carolrtc outsidertc; do
+          for username in alice bob carol alicesas bobsas alicemember bobmember alicetab alicedm bobdm alicework bobwork alicertc bobrtc carolrtc outsidertc aliceux; do
             docker compose --env-file .env -f deploy/compose.dev.yml exec -T synapse \
               register_new_matrix_user -c /data/homeserver.yaml \
               -u "$username" -p "$password" --no-admin http://localhost:8008
