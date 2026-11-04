@@ -79,6 +79,26 @@ test('MatrixRTC authorizes three participants in an E2EE voice channel', async (
     await carol.getByRole('button', { name: 'Начать голосовой звонок' }).click();
     await expect(bob.getByRole('dialog', { name: 'Защищённый звонок' })).toBeVisible();
     await expect(carol.getByRole('dialog', { name: 'Защищённый звонок' })).toBeVisible();
+
+    // A visible overlay is not proof of a call: enter the official Element Call
+    // lobby on all three clients and require its joined callback.
+    for (const page of pages) {
+      const dialog = page.getByRole('dialog', { name: 'Защищённый звонок' });
+      const join = dialog.getByRole('button', { name: 'Присоединиться', exact: true });
+      await expect(join).toBeVisible({ timeout: 45_000 });
+      await join.click();
+      await expect(dialog.getByText('В звонке · E2EE')).toBeVisible({ timeout: 45_000 });
+    }
+    // Fake microphone tracks are supplied by Chromium; changing the state
+    // must be reflected in Element Call controls.
+    const dialog = bob.getByRole('dialog', { name: 'Защищённый звонок' });
+    const enableMicrophone = dialog.getByRole('button', { name: 'Включить микрофон' });
+    await expect(enableMicrophone).toBeVisible();
+    await enableMicrophone.click();
+    await expect(dialog.getByRole('button', { name: 'Отключить микрофон' })).toBeVisible();
+    await dialog.getByRole('button', { name: 'Отключить микрофон' }).click();
+    await expect(enableMicrophone).toBeVisible();
+
     await alice.getByRole('button', { name: 'Покинуть звонок' }).click();
     await expect(alice.getByRole('dialog', { name: 'Защищённый звонок' })).toHaveCount(0);
   } finally {
