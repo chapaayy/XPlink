@@ -518,5 +518,117 @@
     "dependencies": "Matrix specification",
     "test": "review",
     "review": "2026-11-04"
+  },
+  {
+    "path": "packages/rtc-adapter/package.json",
+    "purpose": "Independent MatrixRTC adapter workspace",
+    "contract": "pnpm package",
+    "dependencies": "matrix-js-sdk, Rust Crypto adapter",
+    "test": "CI pnpm typecheck",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/rtc-adapter/tsconfig.json",
+    "purpose": "Strongly typed RTC adapter config",
+    "contract": "TypeScript project",
+    "dependencies": "tsconfig.base.json",
+    "test": "CI typecheck",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/rtc-adapter/src/transport.ts",
+    "purpose": "Authenticated homeserver RTC transport lookup and trusted URL gate",
+    "contract": "discoverRtcTransport/isTrustedRtcUrl",
+    "dependencies": "Matrix client API",
+    "test": "RTC unit+integration",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/rtc-adapter/src/call-session.ts",
+    "purpose": "Fail-closed call authorization prior to media startup",
+    "contract": "authorizeRtcCall",
+    "dependencies": "Matrix E2EE+transport",
+    "test": "RTC unit+E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/rtc-adapter/src/index.ts",
+    "purpose": "Single RTC adapter entrypoint",
+    "contract": "RTC exports",
+    "dependencies": "RTC implementation",
+    "test": "CI types",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/rtc-adapter/src/call-session.test.ts",
+    "purpose": "RTC missing encryption and unsafe transport negative tests",
+    "contract": "Vitest tests",
+    "dependencies": "Vitest",
+    "test": "CI unit",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "packages/matrix-adapter/src/voice.ts",
+    "purpose": "E2EE voice channel marker and creation",
+    "contract": "createVoiceRoom/isVoiceRoom",
+    "dependencies": "Matrix rooms",
+    "test": "E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/calls/CallOverlay.tsx",
+    "purpose": "Lazy official Element Call, call lifecycle, device and screen-share UI",
+    "contract": "CallOverlay",
+    "dependencies": "RTC adapter + Element Call",
+    "test": "RTC E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/features/calls/CreateVoiceRoomForm.tsx",
+    "purpose": "Private encrypted voice room form",
+    "contract": "CreateVoiceRoomForm",
+    "dependencies": "Matrix adapter",
+    "test": "RTC E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "apps/web/src/shared/styles/stage4.css",
+    "purpose": "Isolation of call layout and controls",
+    "contract": "RTC styles",
+    "dependencies": "Vite CSS",
+    "test": "CI build",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "scripts/init-rtc.sh",
+    "purpose": "Idempotent private RTC provisioning in Synapse container",
+    "contract": "bash script",
+    "dependencies": "Docker+Synapse",
+    "test": "Docker E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "services/synapse/enable_rtc.py",
+    "purpose": "Secret management and homeserver config migration",
+    "contract": "python CLI",
+    "dependencies": "PyYAML, appservice",
+    "test": "Docker E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": "tests/e2e/stage4-matrixrtc.spec.ts",
+    "purpose": "Three-browser MatrixRTC authorization and secure call UI smoke",
+    "contract": "Playwright E2E",
+    "dependencies": "LiveKit, JWT, Synapse",
+    "test": "CI RTC E2E",
+    "review": "2026-11-04"
+  },
+  {
+    "path": ".github/workflows/bootstrap-stage4.yml",
+    "purpose": "Resolve pinned RTC packages, format and lock on feature branch",
+    "contract": "GHA workflow",
+    "dependencies": "pnpm",
+    "test": "CI quality",
+    "review": "2026-11-04"
   }
 ]
